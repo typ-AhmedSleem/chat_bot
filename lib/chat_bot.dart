@@ -1,8 +1,9 @@
-
 import 'chat_bot_platform_interface.dart';
 
 class ChatBot {
-  Future<String?> getPlatformVersion() {
-    return ChatBotPlatform.instance.getPlatformVersion();
+
+  Future<String?> askChatBot() {
+    return ChatBotPluginPlatform.instance.askChatBot();
   }
+
 }

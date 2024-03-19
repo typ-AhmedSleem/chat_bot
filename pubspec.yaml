@@ -1,6 +1,6 @@
 name: chat_bot
-description: "A new Flutter project."
-version: 0.0.1
+description: "NLU based ChatBot plugin for flutter apps that can be used to do various actions based on user speech input"
+version: 0.1.0
 homepage:
 
 environment:
