@@ -28,4 +28,105 @@ class Auth {
     // Return true if request success (code = 200), false otherwise
     return response.statusCode == 200;
   }
+
+  Future<bool> login(String email, String password) async {
+    // Make post request
+    final response = await http.post(
+      // Request url endpoint
+      Uri.parse(helper.parseUri("/api/Authentication/Login")),
+      // Request headers
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      // Request body
+      body: jsonEncode(<String, String>{
+        "email": email,
+        "password": password,
+      }),
+    );
+
+    // Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
+
+  Future<bool> confirmEmail(String userId, String token) async {
+    throw UnimplementedError("Not yet implemented");
+    // Make post request
+    final response = await http.get(
+        // Request url endpoint
+        Uri.parse(helper.parseUri("/api/Authentication/ConfirmEmail")),
+        // Request headers
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        });
+
+    // Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
+
+  Future<bool> resetPassword(String email, String token, String newPass,
+      String confirmPassword) async {
+    // Make post request
+    final response = await http.post(
+      // Request url endpoint
+      Uri.parse(helper.parseUri("/api/Authentication/ResetPassword")),
+      // Request headers
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      // Request body
+      body: jsonEncode(<String, String>{
+        "Email": email,
+        "Token": token,
+        "NewPassWord": newPass,
+        "ConfirmPassword": confirmPassword
+      }),
+    );
+
+    // Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
+
+  Future<bool> forgetPassword(String email) async {
+    throw UnimplementedError("Not yet implemented");
+    // Make post request
+    final response = await http.post(
+      // Request url endpoint
+      Uri.parse(helper.parseUri("/api/Authentication/ForgetPassword")),
+      // Request headers
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      // Request body
+      body: jsonEncode(<String, String>{
+        "email": email,
+      }),
+    );
+
+    // Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
+
+  Future<bool> changePassword(String email, String oldPassword,
+      String newPassword, String confirmPassword) async {
+    // Make post request
+    final response = await http.put(
+      // Request url endpoint
+      Uri.parse(helper.parseUri("/api/Authentication/ChangePassword")),
+      // Request headers
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      // Request body
+      body: jsonEncode(<String, String>{
+        "email": email,
+        "oldPassword": oldPassword,
+        "newPassword": newPassword,
+        "confirmNewPassword": confirmPassword
+      }),
+    );
+
+    // Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
 }
