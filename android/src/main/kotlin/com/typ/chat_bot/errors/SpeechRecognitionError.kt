@@ -2,6 +2,10 @@ package com.typ.chat_bot.errors
 
 import android.speech.SpeechRecognizer
 
+/**
+ * Class for SpeechRecognition Error that holds
+ * error code and message
+ */
 sealed class SpeechRecognitionError(val code: Int, val message: String) {
     class SREmptyResponseError : SpeechRecognitionError(0, "Speech recognition returned an empty string.")
     class SRNoMatchError : SpeechRecognitionError(SpeechRecognizer.ERROR_NO_MATCH, "Speech recognition can't figure out what you speak.")

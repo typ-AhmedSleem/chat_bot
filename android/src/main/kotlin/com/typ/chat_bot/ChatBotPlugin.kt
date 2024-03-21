@@ -16,6 +16,7 @@ class ChatBotPlugin: FlutterPlugin, MethodCallHandler {
   override fun onAttachedToEngine(pluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(pluginBinding.binaryMessenger, Constants.METHOD_CHANNEL_NAME)
     channel.setMethodCallHandler(this)
+    // Create a new ChatBot instance
     bot = ChatBot(pluginBinding.applicationContext)
   }
 
