@@ -1,8 +1,13 @@
 import "dart:convert";
+import "package:chat_bot/logger.dart";
 import "package:http/http.dart" as http;
 import "chat_bot_api_helper.dart" as helper;
 
+
 class Auth {
+
+  final logger = Logger("Auth");
+
   Future<bool> register(String fullName, String username, String email,
       String password, String role, String phoneNumber, int age) async {
     // Make post request

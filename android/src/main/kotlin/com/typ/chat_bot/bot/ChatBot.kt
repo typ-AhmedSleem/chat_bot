@@ -23,7 +23,7 @@ class ChatBot(context: Context) : RecognitionListener {
     // Speech recognizer intent
     private val recognizerIntent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("ar"))
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ar")
     }
 
     /**
