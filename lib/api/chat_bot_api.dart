@@ -30,6 +30,8 @@ class Auth {
       }),
     );
 
+    logger.log(response.body);
+
     // Return true if request success (code = 200), false otherwise
     return response.statusCode == 200;
   }
@@ -50,6 +52,8 @@ class Auth {
       }),
     );
 
+    logger.log(response.body);
+
     // Return true if request success (code = 200), false otherwise
     return response.statusCode == 200;
   }
@@ -64,6 +68,8 @@ class Auth {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });
+
+        logger.log(response.body);
 
     // Return true if request success (code = 200), false otherwise
     return response.statusCode == 200;
@@ -88,6 +94,8 @@ class Auth {
       }),
     );
 
+    logger.log(response.body);
+
     // Return true if request success (code = 200), false otherwise
     return response.statusCode == 200;
   }
@@ -107,6 +115,8 @@ class Auth {
         "email": email,
       }),
     );
+
+    logger.log(response.body);
 
     // Return true if request success (code = 200), false otherwise
     return response.statusCode == 200;
@@ -130,6 +140,8 @@ class Auth {
         "confirmNewPassword": confirmPassword
       }),
     );
+
+    logger.log(response.body);
 
     // Return true if request success (code = 200), false otherwise
     return response.statusCode == 200;
