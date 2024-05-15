@@ -1,3 +1,4 @@
+import 'package:chat_bot/actions/action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -16,4 +17,11 @@ class MethodChannelChatBotPlugin extends ChatBotPluginPlatform {
     final speech = await methodChannel.invokeMethod<String?>('startVoiceInput');
     return speech;
   }
+
+  @override
+  Future<Action?> identifyAction(String text) async {
+    final actionName = await methodChannel.invokeMethod('identifyAction', [text]);
+    return Action.getActionFromName(actionName);
+  }
+
 }

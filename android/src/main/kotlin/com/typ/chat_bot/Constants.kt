@@ -6,5 +6,5 @@ object Constants {
 
 object MethodsNames {
     const val START_VOICE_INPUT = "startVoiceInput"
-    const val UNDERSTAND_TEXT = "understandText"
+    const val IDENTIFY_ACTION = "identifyAction"
 }
