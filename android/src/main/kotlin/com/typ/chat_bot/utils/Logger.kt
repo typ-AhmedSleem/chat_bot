@@ -4,7 +4,7 @@ import android.util.Log
 
 class Logger(private val tag: String) {
 
-    fun log(level: LogLevel, what: Any) {
+    fun log(level: LogLevel = LogLevel.DEBUG, what: Any) {
         Log.println(logLevelsMap[level]!!, tag, what.toString())
     }
 

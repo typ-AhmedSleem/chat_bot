@@ -19,8 +19,8 @@ class MethodChannelChatBotPlugin extends ChatBotPluginPlatform {
   }
 
   @override
-  Future<Action?> identifyAction(String text) async {
-    final actionName = await methodChannel.invokeMethod('identifyAction', [text]);
+  Future<Action> identifyAction(String text) async {
+    final actionName = await methodChannel.invokeMethod('identifyAction', text);
     return Action.getActionFromName(actionName);
   }
 

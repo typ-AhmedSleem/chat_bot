@@ -4,6 +4,6 @@ class Logger {
   Logger(this.tag);
 
   void log(String message) {
-    print("[FlutterPages-$tag]: $message"); // ignore: avoid_print
+    print("[FP-$tag]: $message"); // ignore: avoid_print
   }
 }

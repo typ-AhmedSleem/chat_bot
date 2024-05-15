@@ -1,6 +1,8 @@
 package com.typ.chat_bot
 
+import com.typ.chat_bot.actions.ActionIdentifier
 import com.typ.chat_bot.bot.ChatBot
+import com.typ.chat_bot.utils.Logger
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -10,6 +12,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 /** ChatBotPlugin */
 class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
 
+    private val logger = Logger(ActionIdentifier.TAG)
     private lateinit var channel: MethodChannel
     private lateinit var bot: ChatBot
 
@@ -36,8 +39,12 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
             }
 
             MethodsNames.IDENTIFY_ACTION -> {
-                val text = call.arguments as String?
-                // feature: Understand the speech and determine tokens
+                val text = call.arguments as String? ?: return
+                logger.log(Logger.LogLevel.INFO, "Identifying action for text: $text")
+                bot.identifyAction(text) { action, error ->
+                    if (action != null) result.success(action.name)
+                    else result.error("123", error, null)
+                }
             }
 
             else -> {

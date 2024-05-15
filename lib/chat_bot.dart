@@ -1,3 +1,5 @@
+import 'package:chat_bot/actions/action.dart';
+
 import 'chat_bot_platform_interface.dart';
 
 /// Class that holds most functions
@@ -9,4 +11,9 @@ class ChatBot {
   Future<String?> askChatBot() {
     return ChatBotPluginPlatform.instance.askChatBot();
   }
+
+  Future<Action?> identifyAction(String text) {
+    return ChatBotPluginPlatform.instance.identifyAction(text);
+  }
+
 }

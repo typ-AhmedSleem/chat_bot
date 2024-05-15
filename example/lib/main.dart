@@ -40,22 +40,29 @@ class _MyAppState extends State<MyApp> {
             FilledButton(
                 onPressed: () async {
                   // Ask ChatBot and wait for speech
-                  userSpeech =
-                      await chatBot.askChatBot() ?? " <<<NO-SPEECH-RETURNED>>>";
-                  logger.log(userSpeech);
+                  userSpeech = await chatBot.askChatBot() ?? "<<<NO-SPEECH-RETURNED>>>";
+                  logger.log("User speech => '$userSpeech'");
+                  // identify action based on user speech
+                  logger.log("Identifying action based on speech '$userSpeech'");
+                  final action = await chatBot.identifyAction(userSpeech);
+
+                  if (action == null) {
+                    logger.log("Can't identify action from user speech");
+                  } else {
+                    logger.log("Identified action => ${action.getActionName()}");
+                  }
+
                   setState(() {});
                 },
                 child: Text(listening ? "Listening" : userSpeech)),
             FilledButton(
                 onPressed: () async {
-                  logger.log(
-                      "API::register => ${(await auth.register("Ahmed Sleem", "typ", "typahmedsleem@gmail.com", "1234567890", "role", "010", 23))}");
+                  logger.log("API::register => ${(await auth.register("Ahmed Sleem", "typ", "typahmedsleem@gmail.com", "1234567890", "role", "010", 23))}");
                 },
                 child: const Text("API.register")),
             FilledButton(
                 onPressed: () async {
-                  logger.log(
-                      "API::login => ${(await auth.login("Ahmed Sleem", "typ"))}");
+                  logger.log("API::login => ${(await auth.login("Ahmed Sleem", "typ"))}");
                 },
                 child: const Text("API.login")),
             FilledButton(
@@ -65,8 +72,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Text("API.confirm (not ready)")),
             FilledButton(
                 onPressed: () async {
-                  logger.log(
-                      "API::resetPassword => ${(await auth.resetPassword("Ahmed Sleem", "typ", "typahmedsleem@gmail.com", "1234567890"))}");
+                  logger.log("API::resetPassword => ${(await auth.resetPassword("Ahmed Sleem", "typ", "typahmedsleem@gmail.com", "1234567890"))}");
                 },
                 child: const Text("API.resetPassword")),
             FilledButton(
@@ -76,8 +82,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Text("API.forgetPassword (not ready)")),
             FilledButton(
                 onPressed: () async {
-                  logger.log(
-                      "API::changePassword => ${(await auth.changePassword("Ahmed Sleem", "typ", "typahmedsleem@gmail.com", "1234567890"))}");
+                  logger.log("API::changePassword => ${(await auth.changePassword("Ahmed Sleem", "typ", "typahmedsleem@gmail.com", "1234567890"))}");
                 },
                 child: const Text("API.changePassword"))
           ],
