@@ -54,7 +54,7 @@ class ActionTextClassifier(private val context: Context) {
 
     companion object {
         const val TAG = "TextClassifier"
-        const val MODEL_PATH = "model_bert.tflite"
+        const val MODEL_PATH = "model_bert_v2.tflite"
     }
 
 }
