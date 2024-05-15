@@ -1,7 +1,8 @@
 package com.typ.chat_bot
 
-import androidx.annotation.NonNull
-
+import com.typ.chat_bot.actions.ActionIdentifier
+import com.typ.chat_bot.bot.ChatBot
+import com.typ.chat_bot.utils.Logger
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -9,27 +10,50 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
 /** ChatBotPlugin */
-class ChatBotPlugin: FlutterPlugin, MethodCallHandler {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
+class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
 
-  override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "chat_bot")
-    channel.setMethodCallHandler(this)
-  }
+    private val logger = Logger(ActionIdentifier.TAG)
+    private lateinit var channel: MethodChannel
+    private lateinit var bot: ChatBot
 
-  override fun onMethodCall(call: MethodCall, result: Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
-    } else {
-      result.notImplemented()
+    override fun onAttachedToEngine(pluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        channel = MethodChannel(pluginBinding.binaryMessenger, Constants.METHOD_CHANNEL_NAME)
+        channel.setMethodCallHandler(this)
+        // Create a new ChatBot instance
+        bot = ChatBot(pluginBinding.applicationContext)
     }
-  }
 
-  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
-  }
+    override fun onMethodCall(call: MethodCall, result: Result) {
+        when (call.method) {
+            MethodsNames.START_VOICE_INPUT -> {
+                // Listen what user says using SpeechRecognizer
+                bot.listenToUser { text, error ->
+                    if (error != null) {
+                        // Result the error back to flutter
+                        result.error(error.code.toString(), error.message, null)
+                        return@listenToUser
+                    }
+                    // Result the text to flutter
+                    result.success(text)
+                }
+            }
+
+            MethodsNames.IDENTIFY_ACTION -> {
+                val text = call.arguments as String? ?: return
+                logger.log(Logger.LogLevel.INFO, "Identifying action for text: $text")
+                bot.identifyAction(text) { action, error ->
+                    if (action != null) result.success(action.name)
+                    else result.error("123", error, null)
+                }
+            }
+
+            else -> {
+                result.notImplemented()
+            }
+        }
+    }
+
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMethodCallHandler(null)
+    }
 }

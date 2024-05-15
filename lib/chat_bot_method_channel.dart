@@ -1,17 +1,27 @@
+import 'package:chat_bot/actions/action.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'chat_bot_platform_interface.dart';
 
-/// An implementation of [ChatBotPlatform] that uses method channels.
-class MethodChannelChatBot extends ChatBotPlatform {
-  /// The method channel used to interact with the native platform.
+class MethodChannelChatBotPlugin extends ChatBotPluginPlatform {
   @visibleForTesting
-  final methodChannel = const MethodChannel('chat_bot');
+  final methodChannel =
+      const MethodChannel('com.typ.chat_bot.channels.ChatBot');
+
+  /// Starts SpeechToText service in
+  /// the android native side and return
+  /// the detected text after he finishes.
+  @override
+  Future<String?> askChatBot() async {
+    final speech = await methodChannel.invokeMethod<String?>('startVoiceInput');
+    return speech;
+  }
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
+  Future<Action> identifyAction(String text) async {
+    final actionName = await methodChannel.invokeMethod('identifyAction', text);
+    return Action.getActionFromName(actionName);
   }
+
 }
