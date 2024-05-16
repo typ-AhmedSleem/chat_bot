@@ -1,3 +1,4 @@
+import 'package:chat_bot/actions/actions.dart';
 import 'package:chat_bot_example/logger.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +50,11 @@ class _MyAppState extends State<MyApp> {
                   if (action == null) {
                     logger.log("Can't identify action from user speech");
                   } else {
-                    logger.log("Identified action => ${action.getActionName()}");
+                    logger.log("Identified action => ${action.name}");
+                    if (action is CreateAlarmAction) {
+                      logger.log("Will perform '${action.name}' at '${action.methodName}'");
+                      await chatBot.performAction(action, ["8:15"]);
+                    }
                   }
 
                   setState(() {});

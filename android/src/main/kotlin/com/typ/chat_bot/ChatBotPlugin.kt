@@ -47,6 +47,13 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
 
+            MethodsNames.CREATE_ALARM -> {
+                // todo: Grab the list of args from arguments
+                val args = call.arguments as List<Any>? : emptyList()
+                val alarmTimestamp = 0L
+                logger.log(Logger.LogLevel.INFO, "Creating alarm at: $alarmTimestamp")
+            }
+
             else -> {
                 result.notImplemented()
             }
