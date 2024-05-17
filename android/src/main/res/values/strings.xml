@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_speaking">Start speaking…</string>
+    <string name="check_the_microphone_permission">Check the microphone permission</string>
+    <string name="can_t_understand_what_you_said">Can\'t understand what you said</string>
+    <string name="check_permission_or_internet">Check you mic permission or your internet</string>
+</resources>

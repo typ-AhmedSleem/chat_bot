@@ -4,7 +4,8 @@ import android.util.Log
 
 class Logger(private val tag: String) {
 
-    fun log(level: LogLevel = LogLevel.DEBUG, what: Any) {
+    fun log(what: Any, level: LogLevel = LogLevel.DEBUG) {
+        if (!LOG_ENABLED) return
         Log.println(logLevelsMap[level]!!, tag, what.toString())
     }
 
@@ -18,6 +19,7 @@ class Logger(private val tag: String) {
     }
 
     companion object {
+        private const val LOG_ENABLED = true
         private val logLevelsMap = mapOf(
             LogLevel.DEBUG to Log.DEBUG,
             LogLevel.INFO to Log.INFO,

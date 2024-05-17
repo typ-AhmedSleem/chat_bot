@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.widget.Toast
+import com.typ.chat_bot.R
 import com.typ.chat_bot.errors.SpeechRecognitionError
 import com.typ.chat_bot.utils.Logger
 
-class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
+class ChatBotSpeechRecognizer(private val context: Context) : RecognitionListener {
 
     // Logger instance
     private val logger = Logger(TAG)
@@ -37,7 +39,6 @@ class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
         listeningCallback = callback
         // Start listening
         recognizer.startListening(this.recognizerIntent)
-        logger.log(Logger.LogLevel.DEBUG, "listenToUser. Listening...")
     }
 
     /**
@@ -45,7 +46,8 @@ class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
      * to listen for speech
      */
     override fun onReadyForSpeech(params: Bundle?) {
-        logger.log(Logger.LogLevel.DEBUG, "onReadyForSpeech")
+        logger.log("onReadyForSpeech. Listening...")
+        Toast.makeText(context, context.getString(R.string.start_speaking), Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -53,7 +55,6 @@ class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
      * and recognizer starts detecting that
      */
     override fun onBeginningOfSpeech() {
-        logger.log(Logger.LogLevel.DEBUG, "onBeginningOfSpeech")
     }
 
     override fun onRmsChanged(rmsdB: Float) {
@@ -67,7 +68,7 @@ class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
      * and recognizer detects that
      */
     override fun onEndOfSpeech() {
-        logger.log(Logger.LogLevel.DEBUG, "onEndOfSpeech")
+        logger.log("onEndOfSpeech")
     }
 
     /**
@@ -81,7 +82,8 @@ class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
                 SpeechRecognitionError.SRNotSupportedError()
             }
         }
-        logger.log(Logger.LogLevel.DEBUG, "onError. code= $code, $error")
+        logger.log("onError. code= $code, $error")
+        listeningCallback?.invoke(EMPTY_TEXT, error)
     }
 
     /**
@@ -91,11 +93,11 @@ class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
     override fun onResults(results: Bundle?) {
         val speech = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
         listeningCallback?.let { it(speech?.firstOrNull()!!, null) }
-        logger.log(Logger.LogLevel.DEBUG, "onResults. speech= $speech")
+        logger.log("onResults. speech= $speech")
     }
 
     override fun onPartialResults(partialResults: Bundle?) {
-        logger.log(Logger.LogLevel.DEBUG, "onPartialResults.")
+        logger.log("onPartialResults.")
     }
 
     override fun onEvent(eventType: Int, params: Bundle?) {
@@ -104,6 +106,7 @@ class ChatBotSpeechRecognizer(context: Context) : RecognitionListener {
     companion object {
         const val TAG = "ChatBotSTT"
         const val ARABIC = "ar"
+        const val EMPTY_TEXT = ""
     }
 
 }
