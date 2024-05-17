@@ -1,12 +1,10 @@
-import 'dart:ffi';
-
 import 'package:chat_bot/actions/actions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'chat_bot_platform_interface.dart';
 
-class MethodChannelChatBotPlugin extends ChatBotPluginPlatform {
+class ChatBotPlugin extends ChatBotPluginPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('com.typ.chat_bot.channels.ChatBot');
 
@@ -29,7 +27,7 @@ class MethodChannelChatBotPlugin extends ChatBotPluginPlatform {
   }
 
   @override
-  Future<Void?> performAction(Action action, [List args = const []]) async {
-    return await methodChannel.invokeMethod(action.methodName, args);
+  Future<T?> performAction<T>(Action action, [List args = const []]) async {
+    return await methodChannel.invokeMethod<T?>(action.methodName, args);
   }
 }

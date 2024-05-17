@@ -10,7 +10,7 @@ abstract class ChatBotPluginPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static ChatBotPluginPlatform _instance = MethodChannelChatBotPlugin();
+  static ChatBotPluginPlatform _instance = ChatBotPlugin();
 
   static ChatBotPluginPlatform get instance => _instance;
 
@@ -28,12 +28,13 @@ abstract class ChatBotPluginPlatform extends PlatformInterface {
 
   /// Gives text to the chat bot to be classified
   /// and returns the identified action to be done
-  ///
   Future<Action?> identifyAction(String text) {
     throw UnimplementedError("identifyAction has not been implemented yet.");
   }
 
-  Future<Void?> performAction(Action action, [List<dynamic> args = const []]) {
+  /// Performs the given action with given args
+  /// on the native platform
+  Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
     throw UnimplementedError("performAction has not been implemented yet.");
   }
 }

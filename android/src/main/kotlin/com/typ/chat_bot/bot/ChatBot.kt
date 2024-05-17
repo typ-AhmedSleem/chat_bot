@@ -9,7 +9,9 @@ import com.typ.chat_bot.AlarmReceiver
 import com.typ.chat_bot.actions.Action
 import com.typ.chat_bot.actions.ActionIdentifier
 import com.typ.chat_bot.errors.SpeechRecognitionError
+import com.typ.chat_bot.utils.formattedTimestamp
 import java.util.Calendar
+import kotlin.random.Random
 
 class ChatBot(private val context: Context) {
 
@@ -26,16 +28,16 @@ class ChatBot(private val context: Context) {
     }
 
     fun scheduleAlarm(time: Calendar) {
+        Log.i(TAG, "scheduleAlarm: Scheduling alarm at ${time.time.formattedTimestamp()}")
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, AlarmReceiver::class.java)
-        val operation = PendingIntent.getBroadcast(context, RC_ALARM_RECEIVER, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val operation = PendingIntent.getBroadcast(context, Random.nextInt(3000), alarmIntent, PendingIntent.FLAG_MUTABLE)
         am.setExact(AlarmManager.RTC_WAKEUP, time.timeInMillis, operation)
-        Log.i(TAG, "scheduleAlarm: Alarm scheduled at ${time.time}")
+        Log.i(TAG, "scheduleAlarm: Scheduled alarm at ${time.time.formattedTimestamp()}")
     }
 
     companion object {
         const val TAG = "ChatBot"
-        private const val RC_ALARM_RECEIVER = 123
     }
 
 }

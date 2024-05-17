@@ -54,7 +54,12 @@ class _MyAppState extends State<MyApp> {
                     // * TEST: PERFORM ACTION
                     if (action is CreateAlarmAction) {
                       logger.log("Will perform '${action.name}' at '${action.methodName}' with");
-                      await chatBot.performAction(action, ["17/5/2024 08:15"]);
+                      bool scheduled = await chatBot.performAction(action, ["08:15"]);
+                      if (scheduled) {
+                        logger.log("Scheduled alarm successfully.");
+                      } else {
+                        logger.log("Can't schedule alarm at given time.");
+                      }
                     }
                   }
 

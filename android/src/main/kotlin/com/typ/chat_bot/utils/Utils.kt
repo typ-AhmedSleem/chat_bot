@@ -28,7 +28,8 @@ fun parseTimestamp(timestamp: String): Calendar {
     val date = runCatching { formatter.parse(timestamp) }.getOrDefault(Date())
     val calendar = Calendar.getInstance()
     calendar.time = date
-    Log.d("ChatBotPlugin-utils", "parseTimestamp: Parsed '$timestamp' into '${date.formattedTimestamp()}'")
+    calendar.roll(Calendar.MINUTE, 1)
+    Log.d("ChatBotPlugin-utils", "parseTimestamp: Parsed '$timestamp' into '${calendar.time.formattedTimestamp()}'")
     return calendar
 }
 

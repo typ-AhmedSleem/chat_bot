@@ -57,13 +57,8 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
                 logger.log(Logger.LogLevel.INFO, "Creating alarm at: ${alarmTime.time.formattedTimestamp()}")
 
                 // Schedule alarm at the given alarmTime
-                bot.runCatching {
-                    scheduleAlarm(alarmTime)
-                }.onSuccess {
-                    result.success(true)
-                }.onFailure {
-                    result.error("123", it.message, null)
-                }
+                val scheduled = runCatching { bot.scheduleAlarm(alarmTime) }.isSuccess
+                result.success(scheduled)
             }
 
             else -> {
