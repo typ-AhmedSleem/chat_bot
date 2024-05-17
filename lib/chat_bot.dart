@@ -13,9 +13,17 @@ class ChatBot {
   /// Starts SpeechToText service in
   /// the android native side and return
   /// the detected text after he finishes.
-  Future<String?> askChatBot() {
+  Future<String?> askChatBot({bool throws = true}) async {
     logger.log("askChatBot: ChaBot is asking user for his speech...");
-    return ChatBotPluginPlatform.instance.askChatBot();
+    try {
+      return ChatBotPluginPlatform.instance.askChatBot();
+    } catch (e) {
+      if (throws) {
+        rethrow;
+      } else {
+        return null;
+      }
+    }
   }
 
   Future<Action?> identifyAction(String text) {

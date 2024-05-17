@@ -71,6 +71,21 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
                 result.success(scheduled)
             }
 
+            MethodsNames.SEARCH_FOR_SOMETHING -> {
+                // Always returns 'true' as require completion signal
+                result.success(true)
+            }
+
+            MethodsNames.SHOW_ALL_TASKS -> {
+                // Always returns 'true' as require completion signal
+                result.success(true)
+            }
+
+            MethodsNames.CREATE_NEW_TASK -> {
+                // Always returns 'true' as require completion signal
+                result.success(true)
+            }
+
             else -> {
                 result.notImplemented()
             }
