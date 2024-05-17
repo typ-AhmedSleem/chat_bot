@@ -51,9 +51,10 @@ class _MyAppState extends State<MyApp> {
                     logger.log("Can't identify action from user speech");
                   } else {
                     logger.log("Identified action => ${action.name}");
+                    // * TEST: PERFORM ACTION
                     if (action is CreateAlarmAction) {
-                      logger.log("Will perform '${action.name}' at '${action.methodName}'");
-                      await chatBot.performAction(action, ["8:15"]);
+                      logger.log("Will perform '${action.name}' at '${action.methodName}' with");
+                      await chatBot.performAction(action, ["17/5/2024 08:15"]);
                     }
                   }
 

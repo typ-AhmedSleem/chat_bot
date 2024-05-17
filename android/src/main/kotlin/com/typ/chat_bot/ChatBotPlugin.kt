@@ -1,8 +1,10 @@
 package com.typ.chat_bot
 
-import com.typ.chat_bot.actions.ActionIdentifier
 import com.typ.chat_bot.bot.ChatBot
 import com.typ.chat_bot.utils.Logger
+import com.typ.chat_bot.utils.ensureNotEmpty
+import com.typ.chat_bot.utils.formattedTimestamp
+import com.typ.chat_bot.utils.parseTimestamp
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -12,7 +14,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 /** ChatBotPlugin */
 class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
 
-    private val logger = Logger(ActionIdentifier.TAG)
+    private val logger = Logger("ChatBotPlugin")
     private lateinit var channel: MethodChannel
     private lateinit var bot: ChatBot
 
@@ -48,10 +50,20 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
             }
 
             MethodsNames.CREATE_ALARM -> {
-                // todo: Grab the list of args from arguments
-                val args = call.arguments as List<Any>? : emptyList()
-                val alarmTimestamp = 0L
-                logger.log(Logger.LogLevel.INFO, "Creating alarm at: $alarmTimestamp")
+                // Grab the formatted timestamp form args list
+                val args = (call.arguments as List<*>?).ensureNotEmpty("You should pass the formatted timestamp in the flutter call args.")
+                val formattedTimestamp = args.first() as String
+                val alarmTime = parseTimestamp(formattedTimestamp)
+                logger.log(Logger.LogLevel.INFO, "Creating alarm at: ${alarmTime.time.formattedTimestamp()}")
+
+                // Schedule alarm at the given alarmTime
+                bot.runCatching {
+                    scheduleAlarm(alarmTime)
+                }.onSuccess {
+                    result.success(true)
+                }.onFailure {
+                    result.error("123", it.message, null)
+                }
             }
 
             else -> {
