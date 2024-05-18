@@ -1,8 +1,12 @@
 package com.typ.chat_bot
 
-import com.typ.chat_bot.actions.ActionIdentifier
+import android.widget.Toast
 import com.typ.chat_bot.bot.ChatBot
+import com.typ.chat_bot.errors.SpeechRecognitionError
 import com.typ.chat_bot.utils.Logger
+import com.typ.chat_bot.utils.ensureNotEmpty
+import com.typ.chat_bot.utils.formattedTimestamp
+import com.typ.chat_bot.utils.parseTimestamp
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -12,7 +16,7 @@ import io.flutter.plugin.common.MethodChannel.Result
 /** ChatBotPlugin */
 class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
 
-    private val logger = Logger(ActionIdentifier.TAG)
+    private val logger = Logger("ChatBotPlugin")
     private lateinit var channel: MethodChannel
     private lateinit var bot: ChatBot
 
@@ -29,6 +33,14 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
                 // Listen what user says using SpeechRecognizer
                 bot.listenToUser { text, error ->
                     if (error != null) {
+                        // Check if the error is a missing permission
+                        if (error is SpeechRecognitionError.SRNotSupportedError) {
+                            // Open app permissions on device settings
+                            Toast.makeText(bot.context, bot.context.getString(R.string.check_permission_or_internet), Toast.LENGTH_SHORT).show()
+//                            bot.showAppSettings()
+                        } else if (error is SpeechRecognitionError.SRNoMatchError) {
+                            Toast.makeText(bot.context, bot.context.getString(R.string.can_t_understand_what_you_said), Toast.LENGTH_SHORT).show()
+                        }
                         // Result the error back to flutter
                         result.error(error.code.toString(), error.message, null)
                         return@listenToUser
@@ -40,11 +52,38 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
 
             MethodsNames.IDENTIFY_ACTION -> {
                 val text = call.arguments as String? ?: return
-                logger.log(Logger.LogLevel.INFO, "Identifying action for text: $text")
+                logger.log("Identifying action for text: $text", Logger.LogLevel.INFO)
                 bot.identifyAction(text) { action, error ->
                     if (action != null) result.success(action.name)
                     else result.error("123", error, null)
                 }
+            }
+
+            MethodsNames.CREATE_ALARM -> {
+                // Grab the formatted timestamp form args list
+                val args = (call.arguments as List<*>?).ensureNotEmpty("You should pass the formatted timestamp in the flutter call args.")
+                val formattedTimestamp = args.first() as String
+                val alarmTime = parseTimestamp(formattedTimestamp)
+                logger.log("Creating alarm at: ${alarmTime.time.formattedTimestamp()}", Logger.LogLevel.INFO)
+
+                // Schedule alarm at the given alarmTime
+                val scheduled = runCatching { bot.scheduleAlarm(alarmTime) }.isSuccess
+                result.success(scheduled)
+            }
+
+            MethodsNames.SEARCH_FOR_SOMETHING -> {
+                // Always returns 'true' as require completion signal
+                result.success(true)
+            }
+
+            MethodsNames.SHOW_ALL_TASKS -> {
+                // Always returns 'true' as require completion signal
+                result.success(true)
+            }
+
+            MethodsNames.CREATE_NEW_TASK -> {
+                // Always returns 'true' as require completion signal
+                result.success(true)
             }
 
             else -> {

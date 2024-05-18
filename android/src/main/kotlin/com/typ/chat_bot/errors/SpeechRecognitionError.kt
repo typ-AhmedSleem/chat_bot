@@ -17,4 +17,8 @@ sealed class SpeechRecognitionError(val code: Int, val message: String) {
     class SRClientError : SpeechRecognitionError(SpeechRecognizer.ERROR_CLIENT, "Error with recognizer client. Try again.")
     class SRNeedPermissionsError : SpeechRecognitionError(SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS, "Some needed permissions are not granted.")
     class SRRecognizerBusyError : SpeechRecognitionError(SpeechRecognizer.ERROR_RECOGNIZER_BUSY, "Speech recognizer is busy being used by another app.")
+
+    override fun toString(): String {
+        return "${this::class.simpleName}(code=$code, message='$message')"
+    }
 }

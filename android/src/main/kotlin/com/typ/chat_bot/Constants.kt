@@ -7,4 +7,9 @@ object Constants {
 object MethodsNames {
     const val START_VOICE_INPUT = "startVoiceInput"
     const val IDENTIFY_ACTION = "identifyAction"
+
+    const val CREATE_ALARM = "createAlarm"
+    const val SEARCH_FOR_SOMETHING = "searchForSomething"
+    const val SHOW_ALL_TASKS = "showAllTasks"
+    const val CREATE_NEW_TASK = "createNewTask"
 }
