@@ -7,6 +7,7 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.util.Log
 import android.widget.Toast
+import kotlin.concurrent.thread
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -14,22 +15,25 @@ class AlarmReceiver : BroadcastReceiver() {
         Log.v(TAG, "onReceive: Alarm received")
         Toast.makeText(context, "You have an alarm now !!!", Toast.LENGTH_SHORT).show()
         // Play alarm sound
-        val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        RingtoneManager.getRingtone(context, alarmUri).apply {
-            audioAttributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .build()
-
-            play()
-            // Stop alarm after 3 seconds
-            Thread.sleep(ALARM_DURATION)
-            stop()
+        thread {
+            // Get default alarm system sound
+            val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            RingtoneManager.getRingtone(context, alarmUri).apply {
+                audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .build()
+                // Play alarm sound
+                play()
+                // Stop alarm after 3 seconds
+                Thread.sleep(ALARM_DURATION)
+                stop()
+            }
         }
     }
 
     companion object {
         private const val TAG = "ChatBotAlarmReceiver"
-        private val ALARM_DURATION = 10 * 1000L
+        private const val ALARM_DURATION = 10 * 1000L
     }
 
 }
