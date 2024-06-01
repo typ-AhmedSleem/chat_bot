@@ -7,5 +7,5 @@ Text Classification based ChatBot plugin for flutter apps that can be used to do
 
 	[*] Plugin integration for flutter apps.
 
-	[*] Natively wrote for Android. (iOS is coming soon). 
+	[*] Natively wrote for Android. 
 
