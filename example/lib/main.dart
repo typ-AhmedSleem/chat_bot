@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:chat_bot/actions/actions.dart';
+import 'package:chat_bot_example/chat/ui/chat_screen.dart';
 import 'package:chat_bot_example/logger.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,7 @@ import 'package:chat_bot/api/chat_bot_api.dart' as api;
 import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ChatApp());
 }
 
 class MyApp extends StatefulWidget {
