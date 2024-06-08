@@ -3,10 +3,23 @@ import 'package:flutter/material.dart';
 import '../models/message.dart';
 
 class ChatBubble extends StatelessWidget {
+  late final Message msg;
 
-  final Message msg;
+  ChatBubble({super.key, required String content, required bool isMe, required String timestamp}) {
+    msg = Message(content: content, isMe: isMe, timestamp: timestamp);
+  }
 
-  const ChatBubble({super.key, required this.msg});
+  static ChatBubble ofMessage(Message msg) {
+    return ChatBubble(content: msg.content, isMe: msg.isMe, timestamp: msg.timestamp);
+  }
+
+  static ChatBubble botBubble({required String content, required String timestamp}) {
+    return ChatBubble(content: content, isMe: false, timestamp: timestamp);
+  }
+
+  static ChatBubble userBubble({required String content, required String timestamp}) {
+    return ChatBubble(content: content, isMe: false, timestamp: timestamp);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +30,7 @@ class ChatBubble extends StatelessWidget {
         crossAxisAlignment: msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 4.0),
+            margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
             padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
             decoration: BoxDecoration(
               color: msg.isMe ? Colors.blue : Colors.grey[300],
