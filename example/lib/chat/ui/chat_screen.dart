@@ -41,11 +41,19 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemBuilder: (_, idx) {
-                  return ChatBubble(msg: messages[idx]);
-                }),
+            child: ListView(
+              children: [
+                ChatBubble.botBubble(content: "Hi how can i help?", timestamp: "12:15 am"),
+                ChatBubble.userBubble(content: "Search for Ahmed", timestamp: "12:17 am"),
+                ChatBubble.botBubble(content: "Okay! Searching for 'Ahmed'...", timestamp: "12:19 am"),
+                ChatBubble.botBubble(content: "[INFO ABOUT 'Ahmed']", timestamp: "12:22 am"),
+              ],
+            ),
+            // child: ListView.builder(
+            //     padding: const EdgeInsets.all(8.0),
+            //     itemBuilder: (_, idx) {
+            //       return ChatBubble(msg: messages[idx]);
+            //     }),
           ),
           const Divider(height: 1.0),
           Padding(
