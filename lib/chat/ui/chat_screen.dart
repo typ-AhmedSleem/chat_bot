@@ -1,6 +1,7 @@
-import 'package:chat_bot_example/chat/models/message.dart';
-import 'package:chat_bot_example/chat/ui/chat_bubble.dart';
 import 'package:flutter/material.dart';
+
+import '../models/message.dart';
+import 'chat_bubble.dart';
 
 void main() {
   runApp(const ChatApp());
