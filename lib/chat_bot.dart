@@ -1,7 +1,7 @@
 import 'package:chat_bot/actions/actions.dart';
 
 import 'chat_bot_platform_interface.dart';
-import 'logger.dart';
+import 'helpers/logger.dart';
 
 /// Class that holds most functions
 /// that ChatBot can do
