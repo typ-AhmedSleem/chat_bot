@@ -32,8 +32,13 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final List<Message> messages = [];
+  // Runtime
   final chatBot = ChatBot();
+  final List<Message> messages = [
+    Message.defaultMessage() // Add the default message at the start of chat.
+  ];
+
+  final _textInputController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -44,14 +49,12 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ListView(
-              children: [ChatBubble.ofMessage(Message.defaultMessage())],
-            ),
-            // child: ListView.builder(
-            //     padding: const EdgeInsets.all(8.0),
-            //     itemBuilder: (_, idx) {
-            //       return ChatBubble(msg: messages[idx]);
-            //     }),
+            child: ListView.builder(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: messages.length,
+                itemBuilder: (_, idx) {
+                  return ChatBubble.ofMessage(msg: messages[idx]);
+                }),
           ),
           const Divider(height: 1.0),
           Padding(
@@ -60,6 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Expanded(
                   child: TextField(
+                    controller: _textInputController,
                     decoration: InputDecoration(
                       hintText: Texts.typeMessageHere,
                       border: OutlineInputBorder(
@@ -69,21 +73,22 @@ class _ChatScreenState extends State<ChatScreen> {
                       filled: true,
                       fillColor: Colors.grey[200],
                     ),
-                    // onChanged: (msg) {
-                    //   message = msg;
-                    // },
                   ),
                 ),
                 const SizedBox(width: 8.0),
-                CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  child: IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () async {
-                      throw UnimplementedError("Not yet implemented.");
-                    },
-                  ),
-                ),
+                ValueListenableBuilder(
+                    valueListenable: _textInputController,
+                    builder: (_, value, __) {
+                      return CircleAvatar(
+                        backgroundColor: Colors.blue,
+                        child: IconButton(
+                          icon: Icon(value.text.isEmpty ? Icons.mic : Icons.send),
+                          onPressed: () async {
+                            throw UnimplementedError("handle the send button click.");
+                          },
+                        ),
+                      );
+                    }),
               ],
             ),
           ),
@@ -92,7 +97,9 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void askChatBot() async {}
+  void askChatBot() async {
+    throw UnimplementedError("askChatBot is not yet implemented.");
+  }
 
   void sendMessage(Message message) {
     throw UnimplementedError("sendMessage is not yet implemented.");

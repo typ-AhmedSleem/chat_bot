@@ -9,7 +9,7 @@ class ChatBubble extends StatelessWidget {
     msg = Message(content: content, isMe: isMe, timestamp: timestamp);
   }
 
-  static ChatBubble ofMessage(Message msg) {
+  static ChatBubble ofMessage({required Message msg}) {
     return ChatBubble(content: msg.content, isMe: msg.isMe, timestamp: msg.timestamp);
   }
 
