@@ -1,4 +1,5 @@
-import 'package:chat_bot/actions/actions.dart';
+import 'api/chat_bot_api.dart';
+import 'actions/actions.dart';
 
 import 'chat_bot_platform_interface.dart';
 import 'helpers/logger.dart';
@@ -7,6 +8,7 @@ import 'helpers/logger.dart';
 /// that ChatBot can do
 class ChatBot {
   final logger = Logger("ChatBot");
+  final api = PatientAPI();
 
   /// Starts SpeechToText service in
   /// the android native side and return

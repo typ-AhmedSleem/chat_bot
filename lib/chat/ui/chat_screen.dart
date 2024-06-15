@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/message.dart';
 import 'chat_bubble.dart';
+import '../../helpers/texts.dart';
+import 'package:chat_bot/chat_bot.dart';
 
 void main() {
   runApp(const ChatApp());
@@ -30,8 +32,8 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  String? message;
   final List<Message> messages = [];
+  final chatBot = ChatBot();
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: <Widget>[
           Expanded(
             child: ListView(
-              children: [
-                ChatBubble.botBubble(content: "Hi how can i help?", timestamp: "12:15 am"),
-                ChatBubble.userBubble(content: "Search for Ahmed", timestamp: "12:17 am"),
-                ChatBubble.botBubble(content: "Okay! Searching for 'Ahmed'...", timestamp: "12:19 am"),
-                ChatBubble.botBubble(content: "[INFO ABOUT 'Ahmed']", timestamp: "12:22 am"),
-              ],
+              children: [ChatBubble.ofMessage(Message.defaultMessage())],
             ),
             // child: ListView.builder(
             //     padding: const EdgeInsets.all(8.0),
@@ -64,8 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: 'Type message here...',
-                      suffixIcon: const Icon(Icons.mic),
+                      hintText: Texts.typeMessageHere,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20.0),
                         borderSide: BorderSide.none,
@@ -73,9 +69,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       filled: true,
                       fillColor: Colors.grey[200],
                     ),
-                    onChanged: (msg) {
-                      message = msg;
-                    },
+                    // onChanged: (msg) {
+                    //   message = msg;
+                    // },
                   ),
                 ),
                 const SizedBox(width: 8.0),
@@ -83,8 +79,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   backgroundColor: Colors.blue,
                   child: IconButton(
                     icon: const Icon(Icons.send),
-                    onPressed: () {
-                      askChatBot(message);
+                    onPressed: () async {
+                      throw UnimplementedError("Not yet implemented.");
                     },
                   ),
                 ),
@@ -96,10 +92,9 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void askChatBot(String? message) {
-    // todo: build message model
-    // todo: update ui
-    // todo: send message to chat bot native side
-    throw UnimplementedError("askChatBot is not yet implemented.");
+  void askChatBot() async {}
+
+  void sendMessage(Message message) {
+    throw UnimplementedError("sendMessage is not yet implemented.");
   }
 }
