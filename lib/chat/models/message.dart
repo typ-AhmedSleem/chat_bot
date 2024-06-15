@@ -11,4 +11,8 @@ class Message {
   static Message defaultMessage() {
     return Message(content: Texts.startOfChatMessageContent, isMe: false, timestamp: nowFormatted());
   }
+
+  Message editedClone({String? content, bool? isMe, String? timestamp}) {
+    return Message(content: content ?? this.content, isMe: isMe ?? this.isMe, timestamp: timestamp ?? this.timestamp);
+  }
 }

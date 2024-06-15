@@ -1,5 +1,8 @@
+import 'package:chat_bot/actions/actions.dart';
+import 'package:chat_bot/helpers/datetime_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../helpers/utils.dart';
 import '../models/message.dart';
 import 'chat_bubble.dart';
 import '../../helpers/texts.dart';
@@ -44,7 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        title: const Text('ChatBot'),
       ),
       body: Column(
         children: <Widget>[
@@ -84,7 +87,31 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: IconButton(
                           icon: Icon(value.text.isEmpty ? Icons.mic : Icons.send),
                           onPressed: () async {
-                            throw UnimplementedError("handle the send button click.");
+                            String content = value.text;
+                            if (content.isEmpty) {
+                              // * Start voice input
+                              final userSpeech = await chatBot.askChatBot() ?? "";
+                              if (userSpeech.isEmpty) {
+                                // No speech was recognized
+                                showToast(Texts.noSpeechWasRecognized);
+                                return;
+                              }
+                              // Speech is recognized
+                              setState(() {
+                                // Show the recognized speech in the input field
+                                content = userSpeech;
+                                _textInputController.text = content;
+                              });
+                              return;
+                            }
+                            // * Send message
+                            final message = Message(content: content, isMe: true, timestamp: nowFormatted());
+                            sendMessage(message);
+
+                            // * Make ChatBot identify action
+                            final identified = await identifyAction(content);
+
+                            // todo * Update state for runtime and UI
                           },
                         ),
                       );
@@ -97,11 +124,35 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Future<bool> identifyAction(String content) async {
+    // * Show chat bot is thinking
+    await Future.delayed(const Duration(milliseconds: 250));
+    sendMessage(Message(content: "Thinking...", isMe: false, timestamp: nowFormatted()));
+    // * Identify action
+    await Future.delayed(const Duration(milliseconds: 1500));
+    final action = await chatBot.identifyAction(content);
+    _updateLastMessage(content: action?.name ?? "Can't identify action");
+
+    return action != null;
+  }
+
+  void _updateLastMessage({String? content, bool? isMe, String? timestamp}) {
+    try {
+      final lastMessage = messages.last;
+      messages[messages.length - 1] = lastMessage.editedClone(content: content, isMe: isMe, timestamp: timestamp);
+    } catch (_) {
+      // NOTHING TO BE DONE HERE
+    }
+  }
+
   void askChatBot() async {
     throw UnimplementedError("askChatBot is not yet implemented.");
   }
 
   void sendMessage(Message message) {
-    throw UnimplementedError("sendMessage is not yet implemented.");
+    setState(() {
+      messages.add(message);
+      if (message.isMe) _textInputController.clear(); // Clear input field if msg from user.
+    });
   }
 }
