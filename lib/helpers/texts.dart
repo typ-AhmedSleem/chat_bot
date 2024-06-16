@@ -4,6 +4,7 @@ class Texts {
   static const cantIdentifyAction = "عفواً لم اتمكن من فهم ما تقوله. حاول مره اخري";
   static const thinking = "يتم التفكير...";
   static const cancelled = "تم الغاء التنفيذ";
+  static const chatBotIsBusy = "البوت مشغول الان بتنفيذ الامر الحالي. انتظر حتي ينتهي او قم بالغاء المهمة الحاليه";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";

@@ -1,1 +1,1 @@
-enum ChatBotState { idle, listening, thinking, readyToPerform, performingAction }
+enum ChatBotState { idle, listening, thinking, readyToPerform, performingAction, waitingForUserInput }

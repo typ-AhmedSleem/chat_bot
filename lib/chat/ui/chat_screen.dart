@@ -1,4 +1,4 @@
-import 'package:chat_bot/actions/actions.dart' as actions;
+import 'package:chat_bot/actions/actions.dart' as bot_actions;
 import 'package:chat_bot/chat/utils/chatbot_state.dart';
 import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot/chat_bot_errors.dart';
@@ -61,7 +61,13 @@ class _ChatScreenState extends State<ChatScreen> {
                 padding: const EdgeInsets.all(8.0),
                 itemCount: messages.length,
                 itemBuilder: (_, idx) {
-                  return ChatBubble.ofMessage(msg: messages[idx]);
+                  bool showTail = true;
+                  if (idx + 1 < messages.length) {
+                    final currMsg = messages[idx];
+                    final nextMsg = messages[idx + 1];
+                    showTail = currMsg.isMe != nextMsg.isMe;
+                  }
+                  return ChatBubble.ofMessage(msg: messages[idx], showTail: showTail);
                 }),
           ),
           const Divider(height: 1.0),
@@ -197,7 +203,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<actions.Action?> identifyAction(String content) async {
+  Future<bot_actions.Action?> identifyAction(String content) async {
     // * Show chat bot is thinking
     state = ChatBotState.thinking;
     await Future.delayed(const Duration(milliseconds: 250));
