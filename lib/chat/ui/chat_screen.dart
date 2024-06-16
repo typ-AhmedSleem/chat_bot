@@ -1,11 +1,11 @@
+import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot/helpers/datetime_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../helpers/texts.dart';
 import '../../helpers/utils.dart';
 import '../models/message.dart';
 import 'chat_bubble.dart';
-import '../../helpers/texts.dart';
-import 'package:chat_bot/chat_bot.dart';
 
 void main() {
   runApp(const ChatApp());
@@ -84,12 +84,14 @@ class _ChatScreenState extends State<ChatScreen> {
                       return CircleAvatar(
                         backgroundColor: Colors.blue,
                         child: IconButton(
-                          icon: Icon(value.text.isEmpty ? Icons.mic : Icons.send),
+                          icon:
+                              Icon(value.text.isEmpty ? Icons.mic : Icons.send),
                           onPressed: () async {
                             String content = value.text;
                             if (content.isEmpty) {
                               // * Start voice input
-                              final userSpeech = await chatBot.askChatBot() ?? "";
+                              final userSpeech =
+                                  await chatBot.askChatBot() ?? "";
                               if (userSpeech.isEmpty) {
                                 // No speech was recognized
                                 showToast(Texts.noSpeechWasRecognized);
@@ -104,7 +106,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               return;
                             }
                             // * Send message
-                            final message = Message(content: content, isMe: true, timestamp: nowFormatted());
+                            final message = Message(
+                                content: content,
+                                isMe: true,
+                                timestamp: nowFormatted());
                             sendMessage(message);
 
                             // * Make ChatBot identify action
@@ -126,7 +131,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<bool> identifyAction(String content) async {
     // * Show chat bot is thinking
     await Future.delayed(const Duration(milliseconds: 250));
-    sendMessage(Message(content: "Thinking...", isMe: false, timestamp: nowFormatted()));
+    sendMessage(Message(
+        content: "Thinking...", isMe: false, timestamp: nowFormatted()));
     // * Identify action
     await Future.delayed(const Duration(milliseconds: 1500));
     final action = await chatBot.identifyAction(content);
@@ -138,7 +144,8 @@ class _ChatScreenState extends State<ChatScreen> {
   void _updateLastMessage({String? content, bool? isMe, String? timestamp}) {
     try {
       final lastMessage = messages.last;
-      messages[messages.length - 1] = lastMessage.editedClone(content: content, isMe: isMe, timestamp: timestamp);
+      messages[messages.length - 1] = lastMessage.editedClone(
+          content: content, isMe: isMe, timestamp: timestamp);
     } catch (_) {
       // NOTHING TO BE DONE HERE
     }
@@ -151,7 +158,9 @@ class _ChatScreenState extends State<ChatScreen> {
   void sendMessage(Message message) {
     setState(() {
       messages.add(message);
-      if (message.isMe) _textInputController.clear(); // Clear input field if msg from user.
+      if (message.isMe) {
+        _textInputController.clear(); // Clear input field if msg from user.
+      }
     });
   }
 }

@@ -13,7 +13,12 @@ abstract class Action {
 
   factory Action.getActionByName(String name) {
     final actionName = name.trim().toLowerCase();
-    for (Action action in [CreateAlarmAction(), SearchAction(), ShowAllTasksAction(), CreateTaskAction()]) {
+    for (Action action in [
+      CreateAlarmAction(),
+      SearchAction(),
+      ShowAllTasksAction(),
+      CreateTaskAction()
+    ]) {
       if (action.name == actionName) return action;
     }
     return UnknownAction();

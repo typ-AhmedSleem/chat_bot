@@ -5,19 +5,26 @@ import '../models/message.dart';
 class ChatBubble extends StatelessWidget {
   late final Message msg;
 
-  ChatBubble({super.key, required String content, required bool isMe, required String timestamp}) {
+  ChatBubble(
+      {super.key,
+      required String content,
+      required bool isMe,
+      required String timestamp}) {
     msg = Message(content: content, isMe: isMe, timestamp: timestamp);
   }
 
   static ChatBubble ofMessage({required Message msg}) {
-    return ChatBubble(content: msg.content, isMe: msg.isMe, timestamp: msg.timestamp);
+    return ChatBubble(
+        content: msg.content, isMe: msg.isMe, timestamp: msg.timestamp);
   }
 
-  static ChatBubble botBubble({required String content, required String timestamp}) {
+  static ChatBubble botBubble(
+      {required String content, required String timestamp}) {
     return ChatBubble(content: content, isMe: false, timestamp: timestamp);
   }
 
-  static ChatBubble userBubble({required String content, required String timestamp}) {
+  static ChatBubble userBubble(
+      {required String content, required String timestamp}) {
     return ChatBubble(content: content, isMe: false, timestamp: timestamp);
   }
 
@@ -27,11 +34,13 @@ class ChatBubble extends StatelessWidget {
     return Align(
       alignment: msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
-        crossAxisAlignment: msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Container(
             margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
             decoration: BoxDecoration(
               color: msg.isMe ? Colors.blue : Colors.grey[300],
               borderRadius: BorderRadius.only(
@@ -42,7 +51,8 @@ class ChatBubble extends StatelessWidget {
               ),
             ),
             child: Column(
-              crossAxisAlignment: msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  msg.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   msg.content,

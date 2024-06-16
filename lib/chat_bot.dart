@@ -1,6 +1,5 @@
-import 'api/chat_bot_api.dart';
 import 'actions/actions.dart';
-
+import 'api/chat_bot_api.dart';
 import 'chat_bot_platform_interface.dart';
 import 'helpers/logger.dart';
 
@@ -32,7 +31,8 @@ class ChatBot {
   }
 
   Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
-    logger.log("performAction: Performing '${action.name}' at '${action.methodName}' with args '$args'.");
+    logger.log(
+        "performAction: Performing '${action.name}' at '${action.methodName}' with args '$args'.");
     return ChatBotPluginPlatform.instance.performAction(action, args);
   }
 }
