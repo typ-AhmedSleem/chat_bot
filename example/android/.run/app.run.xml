@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false" singleton="true">
-    <module name="android.app.main" />
+    <module name="chat_bot_android" />
     <option name="DEPLOY" value="true" />
     <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
     <option name="DEPLOY_AS_INSTANT" value="false" />
@@ -61,8 +61,6 @@
     <option name="ACTIVITY_CLASS" value="" />
     <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
     <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
-    <method v="2">
-      <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>
