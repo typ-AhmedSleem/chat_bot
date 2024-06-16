@@ -8,6 +8,12 @@ class Message {
 
   Message({required this.content, required this.isMe, required this.timestamp});
 
+  static Message now({required String content, required bool isMe}) => Message(content: content, isMe: isMe, timestamp: nowFormatted());
+
+  static Message user({required String content}) => now(content: content, isMe: true);
+
+  static Message bot({required String content}) => now(content: content, isMe: false);
+
   static Message defaultMessage() {
     return Message(content: Texts.startOfChatMessageContent, isMe: false, timestamp: nowFormatted());
   }

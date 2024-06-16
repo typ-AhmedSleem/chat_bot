@@ -1,4 +1,3 @@
-
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -26,7 +25,7 @@ if (flutterVersionName == null) {
 android {
     namespace "com.typ.chat_bot_example"
     compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

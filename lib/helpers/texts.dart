@@ -2,9 +2,10 @@ class Texts {
   static const typeMessageHere = "اكتب الذي تريده هنا";
   static const startOfChatMessageContent = "السلام عليكم! اخبرني ما الذي تريده ؟";
   static const cantIdentifyAction = "عفواً لم اتمكن من فهم ما تقوله. حاول مره اخري";
-  static const thinking = "يتم التفكير...";
+  static const thinking = "الرجاء الانتظار...";
   static const cancelled = "تم الغاء التنفيذ";
   static const chatBotIsBusy = "البوت مشغول الان بتنفيذ الامر الحالي. انتظر حتي ينتهي او قم بالغاء المهمة الحاليه";
+  static const chatBotNeedsYourAnswer = "يجب عليك الرد علي السؤال لاكمال التنفيذ !!";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";
