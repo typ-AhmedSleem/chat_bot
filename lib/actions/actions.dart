@@ -1,8 +1,11 @@
+import 'package:chat_bot/helpers/texts.dart';
+
 abstract class Action {
+  String title;
   String name;
   String methodName;
 
-  Action(this.name, this.methodName);
+  Action({required this.title, required this.name, required this.methodName});
 
   List<dynamic> args = [];
 
@@ -13,12 +16,7 @@ abstract class Action {
 
   factory Action.getActionByName(String name) {
     final actionName = name.trim().toLowerCase();
-    for (Action action in [
-      CreateAlarmAction(),
-      SearchAction(),
-      ShowAllTasksAction(),
-      CreateTaskAction()
-    ]) {
+    for (Action action in [CreateAlarmAction(), SearchAction(), ShowAllTasksAction(), CreateTaskAction()]) {
       if (action.name == actionName) return action;
     }
     return UnknownAction();
@@ -26,21 +24,21 @@ abstract class Action {
 }
 
 class CreateAlarmAction extends Action {
-  CreateAlarmAction() : super("alarm", "createAlarm");
+  CreateAlarmAction() : super(title: Texts.createAlarmAction, name: "alarm", methodName: "createAlarm");
 }
 
 class SearchAction extends Action {
-  SearchAction() : super("search", "searchForSomething");
+  SearchAction() : super(title: Texts.searchForSomeoneAction, name: "search", methodName: "searchForSomething");
 }
 
 class ShowAllTasksAction extends Action {
-  ShowAllTasksAction() : super("show_all_tasks", "showAllTasks");
+  ShowAllTasksAction() : super(title: Texts.showAllTasksAction, name: "show_all_tasks", methodName: "showAllTasks");
 }
 
 class CreateTaskAction extends Action {
-  CreateTaskAction() : super("task", "createNewTask");
+  CreateTaskAction() : super(title: Texts.createNewTaskAction, name: "task", methodName: "createNewTask");
 }
 
 class UnknownAction extends Action {
-  UnknownAction() : super("unknown", "unknown");
+  UnknownAction() : super(title: Texts.unknownAction, name: "unknown", methodName: "unknown");
 }

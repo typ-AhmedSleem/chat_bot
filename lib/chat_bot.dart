@@ -31,8 +31,7 @@ class ChatBot {
   }
 
   Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
-    logger.log(
-        "performAction: Performing '${action.name}' at '${action.methodName}' with args '$args'.");
+    logger.log("performAction: Performing '${action.name}' at '${action.methodName}' with args '$args'.");
     return ChatBotPluginPlatform.instance.performAction(action, args);
   }
 }

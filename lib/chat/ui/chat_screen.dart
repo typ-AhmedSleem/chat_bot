@@ -1,3 +1,5 @@
+import 'package:chat_bot/actions/actions.dart' as actions;
+import 'package:chat_bot/chat/utils/chatbot_state.dart';
 import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot/helpers/datetime_helper.dart';
 import 'package:flutter/material.dart';
@@ -37,9 +39,11 @@ class _ChatScreenState extends State<ChatScreen> {
   // Runtime
   final chatBot = ChatBot();
   final List<Message> messages = [
-    Message.defaultMessage() // Add the default message at the start of chat.
+    Message.defaultMessage(), // Add the default message at the start of chat.
   ];
+  ChatBotState state = ChatBotState.idle;
 
+  // UI controllers
   final _textInputController = TextEditingController();
 
   @override
@@ -82,40 +86,55 @@ class _ChatScreenState extends State<ChatScreen> {
                     valueListenable: _textInputController,
                     builder: (_, value, __) {
                       return CircleAvatar(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: state == ChatBotState.idle ? Colors.blue : Colors.red,
                         child: IconButton(
-                          icon:
-                              Icon(value.text.isEmpty ? Icons.mic : Icons.send),
+                          icon: Icon(
+                            state == ChatBotState.idle
+                                ? value.text.isEmpty
+                                    ? Icons.mic
+                                    : Icons.send
+                                : Icons.stop,
+                          ),
                           onPressed: () async {
-                            String content = value.text;
-                            if (content.isEmpty) {
-                              // * Start voice input
-                              final userSpeech =
-                                  await chatBot.askChatBot() ?? "";
-                              if (userSpeech.isEmpty) {
-                                // No speech was recognized
-                                showToast(Texts.noSpeechWasRecognized);
-                                return;
-                              }
-                              // Speech is recognized
+                            // * First, check current ChatBot state
+                            if (state != ChatBotState.idle) {
                               setState(() {
-                                // Show the recognized speech in the input field
-                                content = userSpeech;
-                                _textInputController.text = content;
+                                state = ChatBotState.idle;
+                                _textInputController.clear();
+                                _updateLastMessage(content: Texts.cancelled);
                               });
                               return;
                             }
+                            // * Get current typed text
+                            String content = value.text;
+                            if (content.isEmpty) {
+                              // * Start voice input
+                              content = await askChatBot() ?? "";
+                              return;
+                            }
                             // * Send message
-                            final message = Message(
-                                content: content,
-                                isMe: true,
-                                timestamp: nowFormatted());
+                            final message = Message(content: content, isMe: true, timestamp: nowFormatted());
                             sendMessage(message);
 
                             // * Make ChatBot identify action
-                            final identified = await identifyAction(content);
+                            final action = await identifyAction(content);
+                            chatBot.logger.log(action.toString());
+                            setState(() {
+                              _updateLastMessage(content: action?.title ?? Texts.unknownAction);
+                            });
 
-                            // todo * Update state for runtime and UI
+                            if (action == null) {
+                              // Unknown action, reset runtime and
+                              setState(() {
+                                state = ChatBotState.idle;
+                              });
+                              return;
+                            }
+
+                            // todo: * Continue on performing the identified action
+                            setState(() {
+                              state = ChatBotState.readyToPerform;
+                            });
                           },
                         ),
                       );
@@ -128,33 +147,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Future<bool> identifyAction(String content) async {
-    // * Show chat bot is thinking
-    await Future.delayed(const Duration(milliseconds: 250));
-    sendMessage(Message(
-        content: "Thinking...", isMe: false, timestamp: nowFormatted()));
-    // * Identify action
-    await Future.delayed(const Duration(milliseconds: 1500));
-    final action = await chatBot.identifyAction(content);
-    _updateLastMessage(content: action?.name ?? "Can't identify action");
-
-    return action != null;
-  }
-
-  void _updateLastMessage({String? content, bool? isMe, String? timestamp}) {
-    try {
-      final lastMessage = messages.last;
-      messages[messages.length - 1] = lastMessage.editedClone(
-          content: content, isMe: isMe, timestamp: timestamp);
-    } catch (_) {
-      // NOTHING TO BE DONE HERE
-    }
-  }
-
-  void askChatBot() async {
-    throw UnimplementedError("askChatBot is not yet implemented.");
-  }
-
   void sendMessage(Message message) {
     setState(() {
       messages.add(message);
@@ -162,5 +154,44 @@ class _ChatScreenState extends State<ChatScreen> {
         _textInputController.clear(); // Clear input field if msg from user.
       }
     });
+  }
+
+  void _updateLastMessage({String? content, bool? isMe, String? timestamp}) {
+    try {
+      final lastMessage = messages.last;
+      if (lastMessage.isMe) return;
+      messages[messages.length - 1] = lastMessage.editedClone(content: content, isMe: isMe, timestamp: timestamp);
+    } catch (_) {
+      // NOTHING TO BE DONE HERE
+    }
+  }
+
+  Future<String?> askChatBot() async {
+    state = ChatBotState.listening;
+    final userSpeech = await chatBot.askChatBot(throws: true) ?? "";
+    if (userSpeech.isEmpty) {
+      // No speech was recognized
+      state = ChatBotState.idle;
+      showToast(Texts.noSpeechWasRecognized);
+      return null;
+    }
+    // Speech is recognized
+    setState(() {
+      // Show the recognized speech in the input field
+      _textInputController.text = userSpeech;
+    });
+
+    state = ChatBotState.idle;
+    return userSpeech;
+  }
+
+  Future<actions.Action?> identifyAction(String content) async {
+    // * Show chat bot is thinking
+    state = ChatBotState.thinking;
+    await Future.delayed(const Duration(milliseconds: 250));
+    sendMessage(Message(content: Texts.thinking, isMe: false, timestamp: nowFormatted()));
+    // * Identify action
+    await Future.delayed(const Duration(milliseconds: 1500));
+    return await chatBot.identifyAction(content);
   }
 }

@@ -9,16 +9,10 @@ class Message {
   Message({required this.content, required this.isMe, required this.timestamp});
 
   static Message defaultMessage() {
-    return Message(
-        content: Texts.startOfChatMessageContent,
-        isMe: false,
-        timestamp: nowFormatted());
+    return Message(content: Texts.startOfChatMessageContent, isMe: false, timestamp: nowFormatted());
   }
 
   Message editedClone({String? content, bool? isMe, String? timestamp}) {
-    return Message(
-        content: content ?? this.content,
-        isMe: isMe ?? this.isMe,
-        timestamp: timestamp ?? this.timestamp);
+    return Message(content: content ?? this.content, isMe: isMe ?? this.isMe, timestamp: timestamp ?? this.timestamp);
   }
 }

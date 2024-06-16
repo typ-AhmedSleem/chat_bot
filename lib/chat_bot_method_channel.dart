@@ -6,8 +6,7 @@ import 'chat_bot_platform_interface.dart';
 
 class ChatBotPlugin extends ChatBotPluginPlatform {
   @visibleForTesting
-  final methodChannel =
-      const MethodChannel('com.typ.chat_bot.channels.ChatBot');
+  final methodChannel = const MethodChannel('com.typ.chat_bot.channels.ChatBot');
 
   /// Starts SpeechToText service in
   /// the android native side and return
@@ -19,8 +18,7 @@ class ChatBotPlugin extends ChatBotPluginPlatform {
 
   @override
   Future<Action?> identifyAction(String text) async {
-    final actionName =
-        await methodChannel.invokeMethod('identifyAction', text) as String?;
+    final actionName = await methodChannel.invokeMethod('identifyAction', text) as String?;
     if (actionName == null) return null;
 
     final action = Action.getActionByName(actionName);
