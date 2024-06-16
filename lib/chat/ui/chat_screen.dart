@@ -1,8 +1,10 @@
 import 'package:chat_bot/actions/actions.dart' as actions;
 import 'package:chat_bot/chat/utils/chatbot_state.dart';
 import 'package:chat_bot/chat_bot.dart';
+import 'package:chat_bot/chat_bot_errors.dart';
 import 'package:chat_bot/helpers/datetime_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../helpers/texts.dart';
 import '../../helpers/utils.dart';
@@ -89,6 +91,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         backgroundColor: state == ChatBotState.idle ? Colors.blue : Colors.red,
                         child: IconButton(
                           icon: Icon(
+                            color: Colors.white,
                             state == ChatBotState.idle
                                 ? value.text.isEmpty
                                     ? Icons.mic
@@ -168,21 +171,30 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<String?> askChatBot() async {
     state = ChatBotState.listening;
-    final userSpeech = await chatBot.askChatBot(throws: true) ?? "";
-    if (userSpeech.isEmpty) {
-      // No speech was recognized
+    try {
+      final userSpeech = (await chatBot.askChatBot(throws: true))!!;
+      if (userSpeech.isEmpty) {
+        // No speech was recognized
+        state = ChatBotState.idle;
+        showToast(Texts.errorNoSpeechWasRecognized);
+        return null;
+      }
+      // Speech is recognized
+      setState(() {
+        // Show the recognized speech in the input field
+        _textInputController.text = userSpeech;
+      });
+
+      // Return the recognized speech
       state = ChatBotState.idle;
-      showToast(Texts.noSpeechWasRecognized);
+      return userSpeech;
+    } on PlatformException catch (e) {
+      state = ChatBotState.idle;
+      final code = int.parse(e.code);
+      final error = ChatBotError.getErrorByCode(code);
+      if (error != null) showToast(error.message);
       return null;
     }
-    // Speech is recognized
-    setState(() {
-      // Show the recognized speech in the input field
-      _textInputController.text = userSpeech;
-    });
-
-    state = ChatBotState.idle;
-    return userSpeech;
   }
 
   Future<actions.Action?> identifyAction(String content) async {

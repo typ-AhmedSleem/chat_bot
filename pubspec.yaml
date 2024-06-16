@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.0
-  intl: ^0.17.0
   fluttertoast: ^8.0.9
+  chat_bubbles: ^1.6.0
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:

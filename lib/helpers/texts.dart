@@ -1,10 +1,15 @@
 class Texts {
   static const typeMessageHere = "اكتب الذي تريده هنا";
   static const startOfChatMessageContent = "السلام عليكم! اخبرني ما الذي تريده ؟";
-  static const noSpeechWasRecognized = "عفواً لم اتمكن من فهم ما تقوله. حاول مره اخري";
-  static const cantIdentifyAction = "لم اتمكن من التعرف علي الذي تريد فعله. حاول مره اخري";
+  static const cantIdentifyAction = "عفواً لم اتمكن من فهم ما تقوله. حاول مره اخري";
   static const thinking = "يتم التفكير...";
   static const cancelled = "تم الغاء التنفيذ";
+
+  // Errors
+  static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";
+  static const errorNoInternetError = "تحقق من اتصال الانترنت الخاص بك و حاول مجدداً";
+  static const errorRecognizerBusy = "البوت مشغول ولا يمكن استخدامه حاليا !!";
+  static const errorNeedMicPermission = "اذن الوصول الي الميكروفون مطلوب للاستمرار !";
 
   // Create Alarm action
   static const createAlarmAction = "هل تريد انشاء تنبيه ؟";
