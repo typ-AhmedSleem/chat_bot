@@ -1,4 +1,5 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'actions/actions.dart';
 import 'api/chat_bot_api.dart';
@@ -10,6 +11,7 @@ import 'helpers/logger.dart';
 class ChatBot {
   final logger = Logger("ChatBot");
   final api = PatientAPI();
+  final _imagePicker = ImagePicker();
 
   /// Starts SpeechToText service in
   /// the android native side and return
@@ -41,4 +43,14 @@ class ChatBot {
     if (timestamp == null) return false;
     return AndroidAlarmManager.oneShotAt(timestamp, id, callback, exact: true, wakeup: true, rescheduleOnReboot: true);
   }
-}
+
+  Future<String?> pickImageFromGallery() async {
+    final XFile? imgXFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+    return imgXFile?.path;
+
+    // if (imgXFile != null) {
+    // final imgBytes = await imgPath.readAsBytes();
+    // final image = await decodeImageFromList(bytes);
+    // return null;
+    // }
+  }
