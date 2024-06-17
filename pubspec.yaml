@@ -13,12 +13,14 @@ dependencies:
   http: ^1.2.0
   fluttertoast: ^8.0.9
   chat_bubbles: ^1.6.0
+  #  flutter_local_notifications: ^12.0.0
+  android_alarm_manager_plus: ^4.0.3
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
+  flutter_lints: ^4.0.0
 
 flutter:
   plugin:
