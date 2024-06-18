@@ -14,7 +14,8 @@ class Texts {
   static const errorNeedMicPermission = "اذن الوصول الي الميكروفون مطلوب للاستمرار !";
 
   // Create Alarm action
-  static const createAlarmAction = "هل تريد انشاء تنبيه ؟";
+  static const createAlarmAction = "هل تريد انشاء تنبيه في الوقت الذي حددته؟";
+  static const cantDetermineAlarmTime = "لم اتمكن من تحديد وقت التنبيه من كلامك. حاول مجدداً..";
 
   // Search action
   static const searchForSomeoneAction = "هل تريد البحث عن شخص ؟";

@@ -2,7 +2,7 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   android_alarm_manager_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: android_alarm_manager_plus
       sha256: "029123de1d44a0313cecc2868065cf5ec5b24802d43f9a4e0162993fc6751ff4"

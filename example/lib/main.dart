@@ -1,14 +1,18 @@
 import 'dart:math';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:chat_bot/actions/actions.dart';
+import 'package:chat_bot/chat/ui/chat_screen.dart';
 import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot_example/logger.dart';
 import 'package:flutter/material.dart';
-
-import 'package:chat_bot/chat/ui/chat_screen.dart';
 import 'package:flutter/services.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize the alarm manager
+  await AndroidAlarmManager.initialize();
   runApp(const ChatApp());
 }
 
@@ -42,11 +46,15 @@ class _MyAppState extends State<MyApp> {
           title: const Text('ChatBot'),
         ),
         body: Center(
-            child: Column(mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(padding: const EdgeInsets.only(top: 0, bottom: 50), 
-            child: Text(prompt,
-            style: const TextStyle(fontSize: 18),)),
+            Padding(
+                padding: const EdgeInsets.only(top: 0, bottom: 50),
+                child: Text(
+                  prompt,
+                  style: const TextStyle(fontSize: 18),
+                )),
             // Ask ChatBot button
             FilledButton(
                 onPressed: () async {

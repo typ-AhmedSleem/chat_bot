@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:chat_bot/actions/action_answer.dart';
 import 'package:chat_bot/actions/actions.dart' as bot_actions;
 import 'package:chat_bot/chat/utils/chatbot_state.dart';
@@ -13,7 +15,7 @@ import '../models/message.dart';
 import 'chat_bubble.dart';
 import 'widgets/chatbot_message_bar.dart';
 
-void main() {
+void main() async {
   runApp(const ChatApp());
 }
 
@@ -109,12 +111,32 @@ class _ChatScreenState extends State<ChatScreen> {
                   sendMessage(Message.bot(content: Texts.unknownAction));
                   return;
                 }
-                _updateLastMessage(content: action.title);
-                setState(() {
-                  currentAction = action;
-                  _state = ChatBotState.waitingForUserInput;
-                  _currentActionAnswerRequest = ActionAnswerRequest.raw(hintMessageBar: "نعم او لا...");
-                });
+
+                // * Update runtime
+                currentAction = action;
+
+                // * ===== TEST OF CREATE ALARM ACTION ===== //
+                if (action is bot_actions.CreateAlarmAction) {
+                  final alarmTimestamp = parseTimestamp(content);
+                  final formattedAlarmTime = formatTimestamp(alarmTimestamp);
+                  // * Check the alarm time parsed or not
+                  if (alarmTimestamp == null) {
+                    _updateLastMessage(content: Texts.cantDetermineAlarmTime);
+                    cancelCurrentAction();
+                    return;
+                  }
+                  // * Schedule the alarm
+                  (currentAction as bot_actions.CreateAlarmAction).alarmTime = alarmTimestamp;
+                  _updateLastMessage(content: formattedAlarmTime);
+                  sendMessage(Message.bot(content: Texts.createAlarmAction));
+                } else {
+                  _updateLastMessage(content: action.title);
+                  cancelCurrentAction();
+                  return;
+                }
+                // * ======================================= //
+                _state = ChatBotState.waitingForUserInput;
+                _currentActionAnswerRequest = ActionAnswerRequest.raw(hintMessageBar: "نعم او لا...");
               });
             },
             onSubmitAnswerForAction: (answer) async {
@@ -129,7 +151,21 @@ class _ChatScreenState extends State<ChatScreen> {
                 });
                 // * Make a test on just the create alarm action
                 if (currentAction != null) {
-                  if (currentAction is! bot_actions.CreateAlarmAction) cancelCurrentAction();
+                  if (currentAction is! bot_actions.CreateAlarmAction) {
+                    cancelCurrentAction();
+                    return true;
+                  }
+                  final action = currentAction as bot_actions.CreateAlarmAction;
+                  if (rawAnswer != 'نعم') {
+                    cancelCurrentAction();
+                    return true;
+                  }
+                  final scheduled = await chatBot.scheduleAlarm(id: Random().nextInt(1000), timestamp: action.alarmTime, callback: _handleAlarm);
+                  if (!scheduled) {
+                    sendMessage(Message.bot(content: "تعذر انشاء تنبيه كما طلبت."));
+                    await finishCurrentAction();
+                    return true;
+                  }
                   sendMessage(Message.bot(content: "تم انشاء تنبيه كما طلبت :)"));
                   await finishCurrentAction();
                 }
@@ -273,8 +309,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> finishCurrentAction() async {
-    await Future.delayed(const Duration(seconds: 1));
-    sendMessage(Message.bot(content: "هل تريد تنفيذ شئ اخر ؟"));
     setState(() {
       _state = ChatBotState.idle;
       _textInputController.clear();
@@ -282,6 +316,8 @@ class _ChatScreenState extends State<ChatScreen> {
       _currentActionAnswerRequest = null;
       // todo: add small centered message showing that this current action life has ended
     });
+    await Future.delayed(const Duration(seconds: 1));
+    sendMessage(Message.bot(content: "هل تريد تنفيذ شئ اخر ؟"));
   }
 
   void grabInputForCurrentExecutingAction(String typedContent) async {
@@ -299,5 +335,11 @@ class _ChatScreenState extends State<ChatScreen> {
       // todo: * Associate the response with the provided answer
       _state = ChatBotState.performingAction;
     });
+  }
+
+  static void _handleAlarm(int alarmId) {
+    // Since we cannot show a dialog directly from a background callback,
+    // consider saving the alarm state and showing a dialog when the app is resumed.
+    print('Alarm fired! id= $alarmId');
   }
 }

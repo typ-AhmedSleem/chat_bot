@@ -1,3 +1,5 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+
 import 'actions/actions.dart';
 import 'api/chat_bot_api.dart';
 import 'chat_bot_platform_interface.dart';
@@ -33,5 +35,10 @@ class ChatBot {
   Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
     logger.log("performAction: Performing '${action.name}' at '${action.methodName}' with args '$args'.");
     return ChatBotPluginPlatform.instance.performAction(action, args);
+  }
+
+  Future<bool> scheduleAlarm({required int id, DateTime? timestamp, required Function(int) callback}) async {
+    if (timestamp == null) return false;
+    return AndroidAlarmManager.oneShotAt(timestamp, id, callback, exact: true, wakeup: true, rescheduleOnReboot: true);
   }
 }

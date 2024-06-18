@@ -1,5 +1,7 @@
 import 'package:chat_bot/helpers/texts.dart';
 
+import 'action_answer.dart';
+
 abstract class Action {
   String title;
   String name;
@@ -24,6 +26,10 @@ abstract class Action {
 }
 
 class CreateAlarmAction extends Action {
+  DateTime? alarmTime;
+  ActionAnswerRequest? answerRequest;
+  ActionAnswerResult? answerResult;
+
   CreateAlarmAction() : super(title: Texts.createAlarmAction, name: "alarm", methodName: "createAlarm");
 }
 
