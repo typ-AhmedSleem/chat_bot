@@ -18,8 +18,9 @@ class ActionAnswerRequest {
   final AnswerType type;
   final String? hintMessageBar;
   final List<ActionAnswerChoice> choices;
+  final String expectedAnswer;
 
-  ActionAnswerRequest.raw({this.type = AnswerType.raw, required this.hintMessageBar, this.choices = const []});
+  ActionAnswerRequest.raw({this.type = AnswerType.raw, required this.expectedAnswer, required this.hintMessageBar, this.choices = const []});
 
-  ActionAnswerRequest.choices({this.type = AnswerType.choice, required this.hintMessageBar, required this.choices});
+  ActionAnswerRequest.choices({this.type = AnswerType.choice, required this.expectedAnswer, required this.hintMessageBar, required this.choices});
 }

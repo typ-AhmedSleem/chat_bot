@@ -6,6 +6,8 @@ class Texts {
   static const cancelled = "تم الغاء التنفيذ";
   static const chatBotIsBusy = "البوت مشغول الان بتنفيذ الامر الحالي. انتظر حتي ينتهي او قم بالغاء المهمة الحاليه";
   static const chatBotNeedsYourAnswer = "يجب عليك الرد علي السؤال لاكمال التنفيذ !!";
+  static const yesOrNo = "نعم او لا...";
+  static const answerYes = "نعم";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";

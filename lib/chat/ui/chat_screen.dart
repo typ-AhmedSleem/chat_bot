@@ -102,42 +102,29 @@ class _ChatScreenState extends State<ChatScreen> {
               sendMessage(message, doBeforeSending: () {
                 _state = ChatBotState.thinking;
               });
-              // * Make ChatBot identify action
+              // * Identify action
               final action = await identifyAction(content);
-              chatBot.logger.log(action.toString());
-              setState(() {
-                if (action == null) {
-                  _state = ChatBotState.idle;
-                  sendMessage(Message.bot(content: Texts.unknownAction));
-                  return;
-                }
-
-                // * Update runtime
-                currentAction = action;
-
-                // * ===== TEST OF CREATE ALARM ACTION ===== //
-                if (action is bot_actions.CreateAlarmAction) {
-                  final alarmTimestamp = parseTimestamp(content);
-                  final formattedAlarmTime = formatTimestamp(alarmTimestamp);
-                  // * Check the alarm time parsed or not
-                  if (alarmTimestamp == null) {
-                    _updateLastMessage(content: Texts.cantDetermineAlarmTime);
-                    cancelCurrentAction();
-                    return;
-                  }
-                  // * Schedule the alarm
-                  (currentAction as bot_actions.CreateAlarmAction).alarmTime = alarmTimestamp;
-                  _updateLastMessage(content: formattedAlarmTime);
-                  sendMessage(Message.bot(content: Texts.createAlarmAction));
-                } else {
-                  _updateLastMessage(content: action.title);
-                  cancelCurrentAction();
-                  return;
-                }
-                // * ======================================= //
-                _state = ChatBotState.waitingForUserInput;
-                _currentActionAnswerRequest = ActionAnswerRequest.raw(hintMessageBar: "نعم او لا...");
-              });
+              currentAction = action;
+              if (action == null) {
+                _state = ChatBotState.idle;
+                sendMessage(Message.bot(content: Texts.unknownAction));
+                return;
+              }
+              // * ===== Perform each action ===== * //
+              if (action is bot_actions.CreateAlarmAction) {
+                await performScheduleAlarmAction(content);
+              } else if (action is bot_actions.SearchAction) {
+                await performSearchAction();
+              } else if (action is bot_actions.CreateTaskAction) {
+                await performCreateTaskAction();
+              } else if (action is bot_actions.ShowAllTasksAction) {
+                await performShowAllTasksAction();
+              } else {
+                // Unknown action
+                _updateLastMessage(content: action.title);
+                cancelCurrentAction();
+                return;
+              }
             },
             onSubmitAnswerForAction: (answer) async {
               if (answer.type == AnswerType.raw) {
@@ -156,7 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     return true;
                   }
                   final action = currentAction as bot_actions.CreateAlarmAction;
-                  if (rawAnswer != 'نعم') {
+                  if (rawAnswer != action.answerRequest?.expectedAnswer) {
                     cancelCurrentAction();
                     return true;
                   }
@@ -179,51 +166,6 @@ class _ChatScreenState extends State<ChatScreen> {
               return true;
             },
           ),
-          //       onPressed: () async {
-          //         // * Check current ChatBot state
-          //         if (state == ChatBotState.waitingForUserInput) {
-          //           // Grab the current input as its needed for action being executed
-          //           grabInputForCurrentExecutingAction(value.text.trim());
-          //           return;
-          //         }
-          //         if (state != ChatBotState.idle) {
-          //           cancelCurrentAction();
-          //           return;
-          //         }
-          //         // * Get current typed text
-          //         String content = value.text.trim();
-          //         if (content.isEmpty) {
-          //           // * Start voice input
-          //           content = await askChatBot() ?? "";
-          //           return;
-          //         }
-          //         // * Send message
-          //         final message = Message(content: content, isMe: true, timestamp: nowFormatted());
-          //         sendMessage(message);
-          //
-          //         // * Make ChatBot identify action
-          //         final action = await identifyAction(content);
-          //         chatBot.logger.log(action.toString());
-          //         setState(() {
-          //           _updateLastMessage(content: action?.title ?? Texts.unknownAction);
-          //         });
-          //
-          //         if (action == null) {
-          //           // Unknown action, reset runtime and
-          //           setState(() {
-          //             state = ChatBotState.idle;
-          //           });
-          //           return;
-          //         }
-          //
-          //         // todo: * Continue on performing the identified action
-          //         setState(() {
-          //           state = ChatBotState.waitingForUserInput;
-          //         });
-          //       },
-          //     ),
-          //   );
-          // }),
         ],
       ),
     );
@@ -341,5 +283,45 @@ class _ChatScreenState extends State<ChatScreen> {
     // Since we cannot show a dialog directly from a background callback,
     // consider saving the alarm state and showing a dialog when the app is resumed.
     print('Alarm fired! id= $alarmId');
+  }
+
+  // * ========== Actions handlers ========== * //
+  Future<void> performScheduleAlarmAction(String rawTimestamp) async {
+    final action = currentAction as bot_actions.CreateAlarmAction;
+    final alarmTimestamp = parseTimestamp(rawTimestamp);
+    final formattedAlarmTime = formatTimestamp(alarmTimestamp);
+    // * Check the alarm time parsed or not
+    if (alarmTimestamp == null) {
+      _updateLastMessage(content: Texts.cantDetermineAlarmTime);
+      cancelCurrentAction();
+      return;
+    }
+    // * Schedule the alarm
+    action.alarmTime = alarmTimestamp;
+    _updateLastMessage(content: formattedAlarmTime);
+    sendMessage(Message.bot(content: Texts.createAlarmAction));
+    // * Ask user for his answer
+    _state = ChatBotState.waitingForUserInput;
+    _currentActionAnswerRequest = ActionAnswerRequest.raw(hintMessageBar: Texts.yesOrNo, expectedAnswer: Texts.answerYes);
+  }
+
+  Future<void> performSearchAction() async {
+    // * Ask user for image uploading
+    // * Validate and preprocess the uploaded image
+    // * Send message in chat screen
+    // * Prepare api call to the target endpoint
+    // * Handle api call response and update UI
+  }
+
+  Future<void> performCreateTaskAction() async {
+    // * Ask user for the title of the task
+    // * Validate the task title
+    // * Save the task in the database
+  }
+
+  Future<void> performShowAllTasksAction() async {
+    // * Query database for tasks created today
+    // * Represent the returned tasks list as String
+    // * Display the tasks in a message
   }
 }
