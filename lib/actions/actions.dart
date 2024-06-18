@@ -6,6 +6,7 @@ abstract class Action {
   String title;
   String name;
   String methodName;
+  ActionAnswerRequest? answerRequest;
 
   Action({required this.title, required this.name, required this.methodName});
 
@@ -27,8 +28,6 @@ abstract class Action {
 
 class CreateAlarmAction extends Action {
   DateTime? alarmTime;
-  ActionAnswerRequest? answerRequest;
-  ActionAnswerResult? answerResult;
 
   CreateAlarmAction() : super(title: Texts.createAlarmAction, name: "alarm", methodName: "createAlarm");
 }

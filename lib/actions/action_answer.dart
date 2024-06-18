@@ -1,26 +1,18 @@
-enum AnswerType { raw, choice }
-
-class ActionAnswerChoice {
-  final int id;
-  final String title;
-
-  ActionAnswerChoice({required this.id, required this.title});
-}
-
-class ActionAnswerResult {
-  final AnswerType type;
-  final dynamic answer; // * (type, answer) => (raw, String) or (choice, choice).
-
-  ActionAnswerResult({required this.type, required this.answer});
-}
-
 class ActionAnswerRequest {
-  final AnswerType type;
   final String? hintMessageBar;
-  final List<ActionAnswerChoice> choices;
   final String expectedAnswer;
+  String? submittedAnswer;
 
-  ActionAnswerRequest.raw({this.type = AnswerType.raw, required this.expectedAnswer, required this.hintMessageBar, this.choices = const []});
+  ActionAnswerRequest({required this.expectedAnswer, required this.hintMessageBar});
 
-  ActionAnswerRequest.choices({this.type = AnswerType.choice, required this.expectedAnswer, required this.hintMessageBar, required this.choices});
+  void submitAnswer(String answer) {
+    submittedAnswer = answer;
+  }
+
+  bool get isAnswerSubmitted => (submittedAnswer != null);
+
+  bool get isAnswerCorrect {
+    if (submittedAnswer == null) return false;
+    return expectedAnswer == submittedAnswer;
+  }
 }

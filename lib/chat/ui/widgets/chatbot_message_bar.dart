@@ -9,7 +9,7 @@ class ChatBotMessageBar extends StatelessWidget {
   final Future<String> Function() onVoiceInputPressed;
   final Function onCancelPressed;
   final Function(String) onSubmitMessage;
-  final Future<bool> Function(ActionAnswerResult) onSubmitAnswerForAction;
+  final Future<bool> Function(String) onSubmitAnswerForAction;
   ActionAnswerRequest? answerRequest;
 
   ChatBotMessageBar(
@@ -28,15 +28,11 @@ class ChatBotMessageBar extends StatelessWidget {
 
   get isPerformingAction => ([ChatBotState.thinking, ChatBotState.readyToPerform, ChatBotState.performingAction].contains(state));
 
-  get hasAnswerRequest => null != answerRequest;
-
-  get haRawRequest => (hasAnswerRequest && answerRequest!.type == AnswerType.raw);
-
-  get hasChoicesRequest => (hasAnswerRequest && answerRequest!.type == AnswerType.choice);
+  get hasAnswerRequest => (null != answerRequest);
 
   get shouldMakeInputEnabled {
     if (state == ChatBotState.idle) return true;
-    if (state == ChatBotState.waitingForUserInput && haRawRequest) return true;
+    if (state == ChatBotState.waitingForUserInput && hasAnswerRequest) return true;
     return false;
   }
 
@@ -102,14 +98,12 @@ class ChatBotMessageBar extends StatelessWidget {
                         } else {
                           // * Check if chatbot is waiting for raw input
                           if (state == ChatBotState.waitingForUserInput) {
-                            if (!hasAnswerRequest) {
-                              return;
-                            }
+                            if (!hasAnswerRequest) return;
                             // * Handle the action answer request
-                            final answer = ActionAnswerResult(type: answerRequest!.type, answer: content);
-                            final handled = await onSubmitAnswerForAction(answer);
+                            final handled = await onSubmitAnswerForAction(content);
                             if (handled) {
                               controller.clear();
+                              answerRequest = null;
                             }
                             return;
                           }
@@ -120,9 +114,7 @@ class ChatBotMessageBar extends StatelessWidget {
                         return;
                       }
                       // * Check if action is to cancel the action
-                      if (isPerformingAction) {
-                        onCancelPressed();
-                      }
+                      if (isPerformingAction) onCancelPressed();
                     },
                   ),
                 );

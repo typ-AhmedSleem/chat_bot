@@ -126,43 +126,36 @@ class _ChatScreenState extends State<ChatScreen> {
                 return;
               }
             },
-            onSubmitAnswerForAction: (answer) async {
-              if (answer.type == AnswerType.raw) {
-                // Only raw text answer, always return true to clear the message bar
-                final rawAnswer = answer.answer as String;
-                // todo: Handle the raw answer
-                sendMessage(Message.user(content: rawAnswer));
-                setState(() {
-                  _currentActionAnswerRequest = null;
-                  _state = ChatBotState.readyToPerform;
-                });
-                // * Make a test on just the create alarm action
-                if (currentAction != null) {
-                  if (currentAction is! bot_actions.CreateAlarmAction) {
-                    cancelCurrentAction();
-                    return true;
-                  }
-                  final action = currentAction as bot_actions.CreateAlarmAction;
-                  if (rawAnswer != action.answerRequest?.expectedAnswer) {
-                    cancelCurrentAction();
-                    return true;
-                  }
-                  final scheduled = await chatBot.scheduleAlarm(id: Random().nextInt(1000), timestamp: action.alarmTime, callback: _handleAlarm);
-                  if (!scheduled) {
-                    sendMessage(Message.bot(content: "تعذر انشاء تنبيه كما طلبت."));
-                    await finishCurrentAction();
-                    return true;
-                  }
-                  sendMessage(Message.bot(content: "تم انشاء تنبيه كما طلبت :)"));
-                  await finishCurrentAction();
+            onSubmitAnswerForAction: (rawAnswer) async {
+              // * Handle the answer
+              sendMessage(Message.user(content: rawAnswer));
+              setState(() {
+                _currentActionAnswerRequest = null;
+                _state = ChatBotState.readyToPerform;
+              });
+              // * Make a test on just the create alarm action
+              if (currentAction != null) {
+                if (currentAction is! bot_actions.CreateAlarmAction) {
+                  cancelCurrentAction();
+                  return true;
                 }
-                return true;
+                final action = currentAction as bot_actions.CreateAlarmAction;
+                if (action.answerRequest?.isAnswerCorrect ?? false) {
+                  cancelCurrentAction();
+                  return true;
+                }
+                final scheduled = await chatBot.scheduleAlarm(id: Random().nextInt(1000), timestamp: action.alarmTime, callback: _handleAlarm);
+                if (!scheduled) {
+                  sendMessage(Message.bot(content: "تعذر انشاء تنبيه كما طلبت."));
+                  await finishCurrentAction();
+                  return true;
+                }
+                sendMessage(Message.bot(content: "تم انشاء تنبيه كما طلبت :)"));
+                await finishCurrentAction();
               }
-
-              if (answer.type == AnswerType.choice) {
-                // todo: Handle the selected choice answer
-                // todo: Perform the desired operation based on selected choice
-              }
+              // * Clear the current request
+              _currentActionAnswerRequest = null;
+              currentAction?.answerRequest = null;
               return true;
             },
           ),
@@ -302,7 +295,7 @@ class _ChatScreenState extends State<ChatScreen> {
     sendMessage(Message.bot(content: Texts.createAlarmAction));
     // * Ask user for his answer
     _state = ChatBotState.waitingForUserInput;
-    _currentActionAnswerRequest = ActionAnswerRequest.raw(hintMessageBar: Texts.yesOrNo, expectedAnswer: Texts.answerYes);
+    _currentActionAnswerRequest = ActionAnswerRequest(hintMessageBar: Texts.yesOrNo, expectedAnswer: Texts.answerYes);
   }
 
   Future<void> performSearchAction() async {
