@@ -172,14 +172,13 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void sendMessage(Message message, {Function? doBeforeSending}) {
+  void sendMessage(Message message, {Function? doBeforeSending, Function? doAfterSending}) {
     setState(() {
-      if (doBeforeSending != null) doBeforeSending!();
+      if (doBeforeSending != null) doBeforeSending();
       messages.add(message);
-      if (message.isMe) {
-        _textInputController.clear(); // Clear input field if msg from user.
-      }
+      if (message.isMe) _textInputController.clear();
       scrollToLastMessage();
+      if (doAfterSending != null) doAfterSending();
     });
   }
 
@@ -292,10 +291,11 @@ class _ChatScreenState extends State<ChatScreen> {
     // * Schedule the alarm
     action.alarmTime = alarmTimestamp;
     _updateLastMessage(content: formattedAlarmTime);
-    sendMessage(Message.bot(content: Texts.createAlarmAction));
-    // * Ask user for his answer
-    _state = ChatBotState.waitingForUserInput;
-    _currentActionAnswerRequest = ActionAnswerRequest(hintMessageBar: Texts.yesOrNo, expectedAnswer: Texts.answerYes);
+    sendMessage(Message.bot(content: Texts.createAlarmAction), doAfterSending: () {
+      // * Ask user for his answer
+      _state = ChatBotState.waitingForUserInput;
+      _currentActionAnswerRequest = ActionAnswerRequest(hintMessageBar: Texts.yesOrNo, expectedAnswer: Texts.answerYes);
+    });
   }
 
   Future<void> performSearchAction() async {
