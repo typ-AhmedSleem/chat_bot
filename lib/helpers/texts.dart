@@ -10,7 +10,7 @@ class Texts {
   static const yesOrNo = "نعم او لا...";
   static const answerYes = "نعم";
   static const actionFinished = "اكتمل التنفيذ";
-  static const chatBotReady = "جاهز";
+  static const chatBotReady = "جاهز لتنفيذ امر اخر";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";
@@ -19,6 +19,7 @@ class Texts {
   static const errorRecognizerBusy = "البوت مشغول ولا يمكن استخدامه حاليا !!";
   static const errorNeedMicPermission = "اذن الوصول الي الميكروفون مطلوب للاستمرار !";
   static const errorOccurredWhileDoingAction = "حدث خطأ اثناء تنفيذ الامر";
+  static const noInternetConnection = "فشل رفع الصورة الي الخادم. تحقق من اتصال الانترنت و حاول مره اخري";
 
   // Create Alarm action
   static const createAlarmAction = "هل تريد انشاء تنبيه في الوقت الذي حددته؟";
@@ -32,6 +33,9 @@ class Texts {
   static const imageAccepted = "تم قبول الصورة و يتم التنفيذ الان";
   static const uploadingImage = "يتم رفع الصورة الي الخادم";
   static const waitingForResponse = "في انتظار الرد من الخادم";
+  static const facesRecognized = "تم التعرف علي الوجوه";
+  static const cantRecognizeFaces = "لم اتمكن من التعرف علي الوجوه في الصورة";
+  static const serverFailedToRecognizeFaces = "قام الخادم برفض الطلب او فشل في التعرف علي الوجوه في الصورة";
 
   // Show All Tasks action
   static const showAllTasksAction = "عرض المهام";

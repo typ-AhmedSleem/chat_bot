@@ -48,11 +48,9 @@ class ChatBot {
   Future<String?> pickImageFromGallery() async {
     final XFile? imgXFile = await _imagePicker.pickImage(source: ImageSource.gallery);
     return imgXFile?.path;
+  }
 
-    // if (imgXFile != null) {
-    // final imgBytes = await imgPath.readAsBytes();
-    // final image = await decodeImageFromList(bytes);
-    // return null;
-    // }
+  Future<String> recognizeFaces(String imagePath) {
+    return api.recognizeFaces(imagePath: imagePath);
   }
 }

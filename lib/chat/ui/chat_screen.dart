@@ -61,13 +61,15 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ChatBot'),
+        title: const Center(
+          child: Text('Chatbot'),
+        ),
       ),
       body: Column(
         children: <Widget>[
           Expanded(
             child: ListView.builder(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.symmetric(vertical: 15),
                 itemCount: messages.length,
                 controller: _listScrollController,
                 itemBuilder: (_, idx) {
@@ -241,11 +243,11 @@ class _ChatScreenState extends State<ChatScreen> {
       _currentActionAnswerRequest = null;
     });
     if (reportWithMessage) sendMessage(Message.bot(content: Texts.cancelled));
-    sendMessage(Message.bot(content: Texts.chatBotReady));
+    sendMessage(Message.announcement(content: Texts.chatBotReady));
   }
 
   Future<void> finishCurrentAction({Duration delay = const Duration(milliseconds: 500)}) async {
-    sendMessage(Message.bot(content: Texts.chatBotReady), doBeforeSending: () async {
+    sendMessage(Message.announcement(content: Texts.chatBotReady), doBeforeSending: () async {
       setState(() {
         _state = ChatBotState.idle;
         _textInputController.clear();
@@ -312,20 +314,26 @@ class _ChatScreenState extends State<ChatScreen> {
       await Future.delayed(const Duration(milliseconds: 250));
       _updateLastMessage(content: Texts.imageAccepted);
 
-      // * Prepare api call to the target endpoint
-      await sendMessage(Message.announcement(content: Texts.uploadingImage), doBeforeSending: () async {
+      // * Do some fancy UI updates
+      await sendMessage(Message.announcement(content: Texts.uploadingImage), doAfterSending: () async {
         await Future.delayed(const Duration(milliseconds: 250));
       });
 
-      // * Send api call
-      await sendMessage(Message.announcement(content: Texts.waitingForResponse), doBeforeSending: () async {
-        await Future.delayed(const Duration(milliseconds: 250));
-      });
+      // * Send the api call
+      final String recognizedFaces = await chatBot.recognizeFaces(imagePath);
+
       // * Handle response from the api call
-      throw Exception("API call isn't yet ready");
+      if (recognizedFaces.isEmpty) throw CBError(message: Texts.cantRecognizeFaces);
+      sendMessage(Message.bot(content: recognizedFaces), doBeforeSending: () async {
+        await sendMessage(Message.announcement(content: Texts.facesRecognized));
+      });
 
       // * Finish the current action
       finishCurrentAction(delay: const Duration(seconds: 1));
+    } on ChatBotError catch (cbe) {
+      await sendMessage(Message.bot(content: cbe.message), doAfterSending: () {
+        cancelCurrentAction(reportWithMessage: false);
+      });
     } catch (e) {
       await sendMessage(Message.bot(content: Texts.errorOccurredWhileDoingAction), doAfterSending: () {
         cancelCurrentAction(reportWithMessage: false);

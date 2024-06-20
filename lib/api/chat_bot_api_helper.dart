@@ -1,13 +1,14 @@
 class ApiHelper {
-  static const String baseUrl = "https://electronicmindofalzheimerpatients.azurewebsites.net";
+  final String baseUrl = "https://electronicmindofalzheimerpatients.azurewebsites.net";
+  final String baseAPI;
 
-  static String parseUri(String endpoint) {
-    return "$baseUrl/$endpoint";
+  ApiHelper(this.baseAPI);
+
+  String endpointLink(String endpoint) {
+    return "$baseUrl/$baseAPI/$endpoint";
   }
-}
 
-const String baseUrl = "https://electronicmindofalzheimerpatients.azurewebsites.net";
-
-String parseUri(String endpoint) {
-  return "$baseUrl$endpoint";
+  Uri resolveEndpoint(String endpoint) {
+    return Uri.parse(endpointLink(endpoint));
+  }
 }
