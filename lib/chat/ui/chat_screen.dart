@@ -48,7 +48,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final chatBot = ChatBot();
   final List<Message> messages = [
     Message.defaultMessage(),
-    Message.announcement(content: Texts.chatBotReady),
   ];
   ChatBotState _state = ChatBotState.idle;
 
@@ -164,26 +163,31 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void sendMessage(Message message, {Function? doBeforeSending, Function? doAfterSending}) {
+  Future<void> sendMessage(Message message, {Function? doBeforeSending, Function? doAfterSending}) async {
+    if (doBeforeSending != null) await doBeforeSending();
     setState(() {
-      if (doBeforeSending != null) doBeforeSending();
       messages.add(message);
       if (message.isMe) _textInputController.clear();
       scrollToLastMessage();
-      if (doAfterSending != null) doAfterSending();
     });
+    if (doAfterSending != null) {
+      await doAfterSending();
+      setState(() {});
+    }
   }
 
   void _updateLastMessage({String? content, bool? isMe, String? timestamp}) {
     try {
       final lastMessage = messages.last;
       if (lastMessage.sender != SenderType.bot) {
-        sendMessage(lastMessage.editedClone(content: content, sender: SenderType.bot, timestamp: timestamp));
+        sendMessage(Message.bot(content: content ?? lastMessage.content));
         return;
       }
-      SenderType? sender;
-      if (isMe != null) sender = isMe ? SenderType.user : SenderType.bot;
-      messages[messages.length - 1] = lastMessage.editedClone(content: content, sender: sender, timestamp: timestamp);
+      setState(() {
+        SenderType? sender;
+        if (isMe != null) sender = isMe ? SenderType.user : SenderType.bot;
+        messages[messages.length - 1] = lastMessage.editedClone(content: content, sender: sender, timestamp: timestamp);
+      });
     } catch (_) {
       // NOTHING TO BE DONE HERE
     }
@@ -229,29 +233,28 @@ class _ChatScreenState extends State<ChatScreen> {
     return await chatBot.identifyAction(content);
   }
 
-  void cancelCurrentAction() {
+  void cancelCurrentAction({bool reportWithMessage = true}) {
     setState(() {
-      sendMessage(Message.bot(content: Texts.cancelled), doBeforeSending: () {
-        _state = ChatBotState.idle;
-        _textInputController.clear();
-        currentAction = null;
-        _currentActionAnswerRequest = null;
-      }, doAfterSending: () {
-        sendMessage(Message.announcement(content: Texts.chatBotReady));
-      });
+      _state = ChatBotState.idle;
+      _textInputController.clear();
+      currentAction = null;
+      _currentActionAnswerRequest = null;
     });
+    if (reportWithMessage) sendMessage(Message.bot(content: Texts.cancelled));
+    sendMessage(Message.bot(content: Texts.chatBotReady));
   }
 
-  Future<void> finishCurrentAction() async {
-    sendMessage(Message.announcement(content: Texts.chatBotReady), doAfterSending: () {
-      setState(() async {
+  Future<void> finishCurrentAction({Duration delay = const Duration(milliseconds: 500)}) async {
+    sendMessage(Message.bot(content: Texts.chatBotReady), doBeforeSending: () async {
+      setState(() {
         _state = ChatBotState.idle;
         _textInputController.clear();
         currentAction = null;
         _currentActionAnswerRequest = null;
-        await Future.delayed(const Duration(milliseconds: 500));
-        sendMessage(Message.bot(content: "هل تريد تنفيذ شئ اخر ؟"));
       });
+    }, doAfterSending: () async {
+      await Future.delayed(delay);
+      await sendMessage(Message.bot(content: "هل تريد تنفيذ شئ اخر ؟"));
     });
   }
 
@@ -294,14 +297,40 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> performSearchAction() async {
-    // * Ask user for image uploading
-    final imagePath = await chatBot.pickImageFromGallery();
-    // * Validate and preprocess the uploaded image
-    // * Send message in chat screen
-    // * Prepare api call to the target endpoint
-    // * Handle api call response and update UI
+    try {
+      // * Ask user for image uploading
+      _updateLastMessage(content: Texts.uploadPictureToSearch);
+      final String? imagePath = await chatBot.pickImageFromGallery();
+      // * Validate the image
+      if (imagePath == null) throw CBError(message: "Image picker returned a null path.");
+      if (imagePath.isEmpty) throw CBError(message: "Image picker returned an empty path.");
+      // * Send message in chat screen
+      await sendMessage(Message.image(path: imagePath), doBeforeSending: () {
+        // Update the last message content
+        _updateLastMessage(content: Texts.uploadPictureToSearch);
+      });
+      await Future.delayed(const Duration(milliseconds: 250));
+      _updateLastMessage(content: Texts.imageAccepted);
 
-    finishCurrentAction();
+      // * Prepare api call to the target endpoint
+      await sendMessage(Message.announcement(content: Texts.uploadingImage), doBeforeSending: () async {
+        await Future.delayed(const Duration(milliseconds: 250));
+      });
+
+      // * Send api call
+      await sendMessage(Message.announcement(content: Texts.waitingForResponse), doBeforeSending: () async {
+        await Future.delayed(const Duration(milliseconds: 250));
+      });
+      // * Handle response from the api call
+      throw Exception("API call isn't yet ready");
+
+      // * Finish the current action
+      finishCurrentAction(delay: const Duration(seconds: 1));
+    } catch (e) {
+      await sendMessage(Message.bot(content: Texts.errorOccurredWhileDoingAction), doAfterSending: () {
+        cancelCurrentAction(reportWithMessage: false);
+      });
+    }
   }
 
   Future<void> performCreateTaskAction() async {

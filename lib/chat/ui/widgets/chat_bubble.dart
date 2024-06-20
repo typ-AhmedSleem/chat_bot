@@ -7,46 +7,36 @@ import 'package:flutter/material.dart';
 import '../../models/message.dart';
 
 class ChatBubble extends StatelessWidget {
-  late final Message msg;
-  late final bool _showTail;
+  final Message message;
+  final bool showTail;
 
-  ChatBubble({super.key, required MessageType type, required String content, required bool isMe, required String timestamp, required bool showTail}) {
-    msg = Message(type: type, content: content, sender: isMe ? SenderType.user : SenderType.bot, timestamp: timestamp);
-    _showTail = showTail;
-  }
+  const ChatBubble({super.key, required this.message, required this.showTail});
 
   static ChatBubble ofMessage({required Message msg, required bool showTail}) {
-    return ChatBubble(
-      type: msg.type,
-      content: msg.content,
-      isMe: msg.isMe,
-      timestamp: msg.timestamp,
-      showTail: showTail,
-    );
+    return ChatBubble(message: msg, showTail: showTail);
   }
 
   @override
   Widget build(BuildContext context) {
     // * Return the bubble widget suitable for this message
-    switch (msg.type) {
+    switch (message.type) {
       case MessageType.text:
-        if (msg.sender == SenderType.announcement) {
+        if (message.sender == SenderType.announcement) {
           // Announcement bubble
-          return ActionAnnouncementBubble(content: msg.content);
+          return ActionAnnouncementBubble(content: message.content);
         } else {
           // Normal text bubble from user or bot
           return BubbleSpecialThree(
-            text: msg.content,
-            color: msg.isMe ? Colors.blue : const Color(0xFFE8E8EE),
-            isSender: msg.isMe,
-            tail: _showTail,
-            textStyle: TextStyle(color: msg.isMe ? Colors.white : Colors.black, fontSize: 15.0),
+            text: message.content,
+            color: message.isMe ? Colors.blue : const Color(0xFFE8E8EE),
+            isSender: message.isMe,
+            tail: showTail,
+            textStyle: TextStyle(color: message.isMe ? Colors.white : Colors.black, fontSize: 15.0),
           );
         }
       case MessageType.image:
         // Image bubble
-        print("Displaying image at path: ${File(msg.content)}");
-        return BubbleNormalImage(id: msg.content.hashCode.toString(), image: Image.file(File(msg.content)));
+        return BubbleNormalImage(id: message.content.hashCode.toString(), image: Image.file(File(message.content)));
       default:
         return Container();
     }

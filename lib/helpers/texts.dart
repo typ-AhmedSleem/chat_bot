@@ -18,6 +18,7 @@ class Texts {
   static const errorNoInternetError = "تحقق من اتصال الانترنت الخاص بك و حاول مجدداً";
   static const errorRecognizerBusy = "البوت مشغول ولا يمكن استخدامه حاليا !!";
   static const errorNeedMicPermission = "اذن الوصول الي الميكروفون مطلوب للاستمرار !";
+  static const errorOccurredWhileDoingAction = "حدث خطأ اثناء تنفيذ الامر";
 
   // Create Alarm action
   static const createAlarmAction = "هل تريد انشاء تنبيه في الوقت الذي حددته؟";
@@ -27,6 +28,10 @@ class Texts {
   // Search action
   static const searchForSomeoneAction = "البحث عن شخص";
   static const searchForSomeone = "هل تريد البحث عن شخص ؟";
+  static const uploadPictureToSearch = "قم برفع صورة الشخص الذي تريد البحث عنه..";
+  static const imageAccepted = "تم قبول الصورة و يتم التنفيذ الان";
+  static const uploadingImage = "يتم رفع الصورة الي الخادم";
+  static const waitingForResponse = "في انتظار الرد من الخادم";
 
   // Show All Tasks action
   static const showAllTasksAction = "عرض المهام";
