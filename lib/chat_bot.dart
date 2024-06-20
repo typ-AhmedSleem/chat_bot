@@ -2,6 +2,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'actions/actions.dart';
+import 'alarm_handler.dart';
 import 'api/chat_bot_api.dart';
 import 'chat_bot_platform_interface.dart';
 import 'helpers/logger.dart';
@@ -39,9 +40,9 @@ class ChatBot {
   //   return ChatBotPluginPlatform.instance.performAction(action, args);
   // }
 
-  Future<bool> scheduleAlarm({required int id, DateTime? timestamp, required Function(int) callback}) async {
+  Future<bool> scheduleAlarm({required int id, DateTime? timestamp}) async {
     if (timestamp == null) return false;
-    return AndroidAlarmManager.oneShotAt(timestamp, id, callback, exact: true, wakeup: true, rescheduleOnReboot: true);
+    return AndroidAlarmManager.oneShotAt(timestamp, id, handleAlarm, exact: true, wakeup: true, rescheduleOnReboot: true);
   }
 
   Future<String?> pickImageFromGallery() async {

@@ -136,7 +136,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   cancelCurrentAction();
                   return true;
                 }
-                final scheduled = await chatBot.scheduleAlarm(id: Random().nextInt(1000), timestamp: action.alarmTime, callback: _handleAlarm);
+                final scheduled = await chatBot.scheduleAlarm(id: Random().nextInt(1000), timestamp: action.alarmTime);
                 if (!scheduled) {
                   sendMessage(Message.bot(content: "تعذر انشاء تنبيه كما طلبت."));
                   await finishCurrentAction();
@@ -270,12 +270,6 @@ class _ChatScreenState extends State<ChatScreen> {
       // todo: * Associate the response with the provided answer
       _state = ChatBotState.performingAction;
     });
-  }
-
-  static void _handleAlarm(int alarmId) {
-    // Since we cannot show a dialog directly from a background callback,
-    // consider saving the alarm state and showing a dialog when the app is resumed.
-    print('Alarm fired! id= $alarmId');
   }
 
   // * ========== Actions handlers ========== * //
