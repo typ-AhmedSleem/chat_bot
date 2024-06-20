@@ -29,19 +29,19 @@ abstract class Action {
 class CreateAlarmAction extends Action {
   DateTime? alarmTime;
 
-  CreateAlarmAction() : super(title: Texts.createAlarmAction, name: "alarm", methodName: "createAlarm");
+  CreateAlarmAction() : super(title: Texts.createAlarmAtGivenTime, name: "alarm", methodName: Texts.createAlarmAction);
 }
 
 class SearchAction extends Action {
-  SearchAction() : super(title: Texts.searchForSomeoneAction, name: "search", methodName: "searchForSomething");
+  SearchAction() : super(title: Texts.searchForSomeone, name: "search", methodName: Texts.searchForSomeoneAction);
 }
 
 class ShowAllTasksAction extends Action {
-  ShowAllTasksAction() : super(title: Texts.showAllTasksAction, name: "show_all_tasks", methodName: "showAllTasks");
+  ShowAllTasksAction() : super(title: Texts.showAllTasks, name: "show_all_tasks", methodName: Texts.showAllTasksAction);
 }
 
 class CreateTaskAction extends Action {
-  CreateTaskAction() : super(title: Texts.createNewTaskAction, name: "task", methodName: "createNewTask");
+  CreateTaskAction() : super(title: Texts.createNewTask, name: "task", methodName: Texts.createNewTaskAction);
 }
 
 class UnknownAction extends Action {

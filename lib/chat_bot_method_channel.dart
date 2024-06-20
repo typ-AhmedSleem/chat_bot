@@ -26,8 +26,8 @@ class ChatBotPlugin extends ChatBotPluginPlatform {
     return action;
   }
 
-  @override
-  Future<T?> performAction<T>(Action action, [List args = const []]) async {
-    return await methodChannel.invokeMethod<T?>(action.methodName, args);
-  }
+// @override
+// Future<T?> performAction<T>(Action action, [List args = const []]) async {
+//   return await methodChannel.invokeMethod<T?>(action.methodName, args);
+// }
 }

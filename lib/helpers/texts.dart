@@ -9,6 +9,8 @@ class Texts {
   static const chatBotNeedsYourAnswer = "يجب عليك الرد علي السؤال لاكمال التنفيذ !!";
   static const yesOrNo = "نعم او لا...";
   static const answerYes = "نعم";
+  static const actionFinished = "اكتمل التنفيذ";
+  static const actionCancelled = "تم الغاء الامر";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";
@@ -19,16 +21,20 @@ class Texts {
 
   // Create Alarm action
   static const createAlarmAction = "هل تريد انشاء تنبيه في الوقت الذي حددته؟";
+  static const createAlarmAtGivenTime = "هل تريد انشاء تنبيه في الوقت الذي حددته؟";
   static const cantDetermineAlarmTime = "لم اتمكن من تحديد وقت التنبيه من كلامك. حاول مجدداً..";
 
   // Search action
-  static const searchForSomeoneAction = "هل تريد البحث عن شخص ؟";
+  static const searchForSomeoneAction = "البحث عن شخص";
+  static const searchForSomeone = "هل تريد البحث عن شخص ؟";
 
   // Show All Tasks action
-  static const showAllTasksAction = "هل تريد عرض كل المهام ؟";
+  static const showAllTasksAction = "عرض المهام";
+  static const showAllTasks = "هل تريد عرض كل المهام ؟";
 
   // Create New Task action
-  static const createNewTaskAction = "هل تريد انشاء مهمه جديده ؟";
+  static const createNewTaskAction = "انشاء مهمة";
+  static const createNewTask = "هل تريد انشاء مهمه جديده ؟";
 
   // Unknown action
   static const unknownAction = "لم اتمكن من التعرف علي ما تريد فعله !";

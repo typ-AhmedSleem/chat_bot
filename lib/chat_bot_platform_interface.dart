@@ -32,7 +32,7 @@ abstract class ChatBotPluginPlatform extends PlatformInterface {
 
   /// Performs the given action with given args
   /// on the native platform
-  Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
-    throw UnimplementedError("performAction has not been implemented yet.");
-  }
+// Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
+//   throw UnimplementedError("performAction has not been implemented yet.");
+// }
 }

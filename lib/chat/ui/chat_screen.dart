@@ -12,7 +12,7 @@ import 'package:flutter/services.dart';
 import '../../helpers/texts.dart';
 import '../../helpers/utils.dart';
 import '../models/message.dart';
-import 'chat_bubble.dart';
+import 'widgets/chat_bubble.dart';
 import 'widgets/chatbot_message_bar.dart';
 
 void main() async {
@@ -105,8 +105,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 _updateLastMessage(content: Texts.unknownAction);
                 return;
               }
+              // * Show action started announcement
+              sendMessage(Message.announcement(content: action.methodName));
               // * ===== Perform the action ===== * //
-              else if (action is bot_actions.CreateAlarmAction) {
+              if (action is bot_actions.CreateAlarmAction) {
                 await performScheduleAlarmAction(content);
               } else if (action is bot_actions.SearchAction) {
                 await performSearchAction();
@@ -176,7 +178,9 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       final lastMessage = messages.last;
       if (lastMessage.isMe) return;
-      messages[messages.length - 1] = lastMessage.editedClone(content: content, isMe: isMe, timestamp: timestamp);
+      SenderType? sender;
+      if (isMe != null) sender = isMe ? SenderType.user : SenderType.bot;
+      messages[messages.length - 1] = lastMessage.editedClone(content: content, sender: sender, timestamp: timestamp);
     } catch (_) {
       // NOTHING TO BE DONE HERE
     }
@@ -216,7 +220,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // * Show chat bot is thinking
     _state = ChatBotState.thinking;
     await Future.delayed(const Duration(milliseconds: 250));
-    sendMessage(Message(content: Texts.thinking, isMe: false, timestamp: nowFormatted()));
+    sendMessage(Message.bot(content: Texts.thinking));
     // * Identify action
     await Future.delayed(const Duration(milliseconds: 1500));
     return await chatBot.identifyAction(content);
@@ -228,18 +232,19 @@ class _ChatScreenState extends State<ChatScreen> {
       _textInputController.clear();
       currentAction = null;
       _currentActionAnswerRequest = null;
-      sendMessage(Message.bot(content: Texts.cancelled));
-      // todo: add small centered message showing that this current action life has ended
+      sendMessage(Message.bot(content: Texts.cancelled), doAfterSending: () {
+        sendMessage(Message.announcement(content: Texts.actionCancelled));
+      });
     });
   }
 
   Future<void> finishCurrentAction() async {
+    sendMessage(Message.announcement(content: Texts.actionFinished));
     setState(() {
       _state = ChatBotState.idle;
       _textInputController.clear();
       currentAction = null;
       _currentActionAnswerRequest = null;
-      // todo: add small centered message showing that this current action life has ended
     });
     await Future.delayed(const Duration(seconds: 1));
     sendMessage(Message.bot(content: "هل تريد تنفيذ شئ اخر ؟"));

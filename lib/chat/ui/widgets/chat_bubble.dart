@@ -1,14 +1,14 @@
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 
-import '../models/message.dart';
+import '../../models/message.dart';
 
 class ChatBubble extends StatelessWidget {
   late final Message msg;
   late final bool _showTail;
 
   ChatBubble({super.key, required String content, required bool isMe, required String timestamp, required bool showTail}) {
-    msg = Message(content: content, isMe: isMe, timestamp: timestamp);
+    msg = Message(content: content, sender: isMe ? SenderType.user : SenderType.bot, timestamp: timestamp);
     _showTail = showTail;
   }
 

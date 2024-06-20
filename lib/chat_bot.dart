@@ -34,10 +34,10 @@ class ChatBot {
     return ChatBotPluginPlatform.instance.identifyAction(text);
   }
 
-  Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
-    logger.log("performAction: Performing '${action.name}' at '${action.methodName}' with args '$args'.");
-    return ChatBotPluginPlatform.instance.performAction(action, args);
-  }
+  // Future<T?> performAction<T>(Action action, [List<dynamic> args = const []]) {
+  //   logger.log("performAction: Performing '${action.name}' at '${action.methodName}' with args '$args'.");
+  //   return ChatBotPluginPlatform.instance.performAction(action, args);
+  // }
 
   Future<bool> scheduleAlarm({required int id, DateTime? timestamp, required Function(int) callback}) async {
     if (timestamp == null) return false;
