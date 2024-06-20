@@ -35,7 +35,8 @@ class Texts {
   static const waitingForResponse = "في انتظار الرد من الخادم";
   static const facesRecognized = "تم التعرف علي الوجوه";
   static const cantRecognizeFaces = "لم اتمكن من التعرف علي الوجوه في الصورة";
-  static const serverFailedToRecognizeFaces = "قام الخادم برفض الطلب او فشل في التعرف علي الوجوه في الصورة";
+  static const serverRefusedTheRequest = "قام الخادم برفض الطلب";
+  static const serverFailedToRecognizeFaces = "فشل في التعرف علي الوجوه في الصورة";
 
   // Show All Tasks action
   static const showAllTasksAction = "عرض المهام";

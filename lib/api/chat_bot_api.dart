@@ -32,6 +32,11 @@ class PatientAPI {
       } else {
         // * Request failed
         logger.log("recognizeFaces[FAIL]: Response => '${response.statusCode} | ${response.reasonPhrase}'");
+        if (response.statusCode == 401) {
+          // 401 means: Server refused the request because it's 'Unauthorized'
+          throw CBError(message: Texts.serverRefusedTheRequest);
+        }
+        // Other status codes
         throw CBError(message: Texts.serverFailedToRecognizeFaces);
       }
     } on http.ClientException catch (e) {
