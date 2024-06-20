@@ -59,5 +59,29 @@ class ChatBot {
     return api.recognizeFaces(imagePath: imagePath);
   }
 
+  Future<String> getSecretFile() async {
+    return await api.simpleGetRequest(endpoint: "GetSecretFile");
+  }
+
+  Future<String> getAllAppointments() async {
+    return await api.simpleGetRequest(endpoint: "GetAllAppointments");
+  }
+
+  Future<String> getAllMedicines() async {
+    return await api.simpleGetRequest(endpoint: "GetAllMedicines");
+  }
+
+  Future<String> getMedia() async {
+    return await api.simpleGetRequest(endpoint: "GetMedia");
+  }
+
+  Future<String> getAllGameScores() async {
+    return await api.simpleGetRequest(endpoint: "GetAllGameScores");
+  }
+
+  Future<String> getCurrentAndMaxScore() async {
+    return await api.simpleGetRequest(endpoint: "GetCurrentAndMaxScore");
+  }
+
 // todo: implement wrappers here for the rest of api requests of the PatientsAPI class
 }
