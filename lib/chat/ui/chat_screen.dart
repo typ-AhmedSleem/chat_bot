@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:chat_bot/actions/action_answer.dart';
 import 'package:chat_bot/actions/actions.dart' as bot_actions;
+import 'package:chat_bot/chat/ui/widgets/chat_action_announcement_bubble.dart';
 import 'package:chat_bot/chat/utils/chatbot_state.dart';
 import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot/chat_bot_errors.dart';
@@ -47,7 +48,8 @@ class _ChatScreenState extends State<ChatScreen> {
   ActionAnswerRequest? _currentActionAnswerRequest;
   final chatBot = ChatBot();
   final List<Message> messages = [
-    Message.defaultMessage(), // Add the default message at the start of chat.
+    Message.defaultMessage(),
+    Message.announcement(content: Texts.chatBotReady),
   ];
   ChatBotState _state = ChatBotState.idle;
 
@@ -71,13 +73,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: messages.length,
                 controller: _listScrollController,
                 itemBuilder: (_, idx) {
+                  final currMsg = messages[idx];
                   bool showTail = true;
                   if (idx + 1 < messages.length) {
-                    final currMsg = messages[idx];
                     final nextMsg = messages[idx + 1];
                     showTail = currMsg.isMe != nextMsg.isMe;
                   }
-                  return ChatBubble.ofMessage(msg: messages[idx], showTail: showTail);
+                  if (currMsg.sender == SenderType.announcement) return ActionAnnouncementBubble(content: currMsg.content);
+                  return ChatBubble.ofMessage(msg: currMsg, showTail: showTail);
                 }),
           ),
           const Divider(height: 1.0),
@@ -94,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
             onSubmitMessage: (content) async {
               // * Send message
               final message = Message.user(content: content);
-              sendMessage(message, doBeforeSending: () {
+              sendMessage(message, doAfterSending: () {
                 _state = ChatBotState.thinking;
               });
               // * Identify action
@@ -105,8 +108,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 _updateLastMessage(content: Texts.unknownAction);
                 return;
               }
-              // * Show action started announcement
-              sendMessage(Message.announcement(content: action.methodName));
               // * ===== Perform the action ===== * //
               if (action is bot_actions.CreateAlarmAction) {
                 await performScheduleAlarmAction(content);
@@ -177,7 +178,10 @@ class _ChatScreenState extends State<ChatScreen> {
   void _updateLastMessage({String? content, bool? isMe, String? timestamp}) {
     try {
       final lastMessage = messages.last;
-      if (lastMessage.isMe) return;
+      if (lastMessage.sender != SenderType.bot) {
+        sendMessage(lastMessage.editedClone(content: content, sender: SenderType.bot, timestamp: timestamp));
+        return;
+      }
       SenderType? sender;
       if (isMe != null) sender = isMe ? SenderType.user : SenderType.bot;
       messages[messages.length - 1] = lastMessage.editedClone(content: content, sender: sender, timestamp: timestamp);
@@ -222,32 +226,34 @@ class _ChatScreenState extends State<ChatScreen> {
     await Future.delayed(const Duration(milliseconds: 250));
     sendMessage(Message.bot(content: Texts.thinking));
     // * Identify action
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 1000));
     return await chatBot.identifyAction(content);
   }
 
   void cancelCurrentAction() {
     setState(() {
-      _state = ChatBotState.idle;
-      _textInputController.clear();
-      currentAction = null;
-      _currentActionAnswerRequest = null;
-      sendMessage(Message.bot(content: Texts.cancelled), doAfterSending: () {
-        sendMessage(Message.announcement(content: Texts.actionCancelled));
+      sendMessage(Message.bot(content: Texts.cancelled), doBeforeSending: () {
+        _state = ChatBotState.idle;
+        _textInputController.clear();
+        currentAction = null;
+        _currentActionAnswerRequest = null;
+      }, doAfterSending: () {
+        sendMessage(Message.announcement(content: Texts.chatBotReady));
       });
     });
   }
 
   Future<void> finishCurrentAction() async {
-    sendMessage(Message.announcement(content: Texts.actionFinished));
-    setState(() {
-      _state = ChatBotState.idle;
-      _textInputController.clear();
-      currentAction = null;
-      _currentActionAnswerRequest = null;
+    sendMessage(Message.announcement(content: Texts.chatBotReady), doAfterSending: () {
+      setState(() async {
+        _state = ChatBotState.idle;
+        _textInputController.clear();
+        currentAction = null;
+        _currentActionAnswerRequest = null;
+        await Future.delayed(const Duration(milliseconds: 500));
+        sendMessage(Message.bot(content: "هل تريد تنفيذ شئ اخر ؟"));
+      });
     });
-    await Future.delayed(const Duration(seconds: 1));
-    sendMessage(Message.bot(content: "هل تريد تنفيذ شئ اخر ؟"));
   }
 
   void grabInputForCurrentExecutingAction(String typedContent) async {
@@ -300,17 +306,21 @@ class _ChatScreenState extends State<ChatScreen> {
     // * Send message in chat screen
     // * Prepare api call to the target endpoint
     // * Handle api call response and update UI
+
+    finishCurrentAction();
   }
 
   Future<void> performCreateTaskAction() async {
     // * Ask user for the title of the task
     // * Validate the task title
     // * Save the task in the database
+    finishCurrentAction();
   }
 
   Future<void> performShowAllTasksAction() async {
     // * Query database for tasks created today
     // * Represent the returned tasks list as String
     // * Display the tasks in a message
+    finishCurrentAction();
   }
 }

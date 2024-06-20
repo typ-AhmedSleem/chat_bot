@@ -10,7 +10,7 @@ class Texts {
   static const yesOrNo = "نعم او لا...";
   static const answerYes = "نعم";
   static const actionFinished = "اكتمل التنفيذ";
-  static const actionCancelled = "تم الغاء الامر";
+  static const chatBotReady = "جاهز";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";

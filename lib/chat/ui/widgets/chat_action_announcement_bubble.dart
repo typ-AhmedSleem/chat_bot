@@ -11,8 +11,8 @@ class ActionAnnouncementBubble extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(
-          top: 7,
-          bottom: 7,
+          top: 12,
+          bottom: 15,
         ),
         child: Container(
           decoration: BoxDecoration(
