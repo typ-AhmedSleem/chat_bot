@@ -2,6 +2,7 @@ class Texts {
   static const typeMessageHere = "اكتب الذي تريده هنا";
   static const startOfChatMessageContent = "السلام عليكم! اخبرني ما الذي تريده ؟";
   static const cantIdentifyAction = "عفواً لم اتمكن من فهم ما تقوله. حاول مره اخري";
+  static const listening = "انا اسمعك...";
   static const thinking = "الرجاء الانتظار...";
   static const cancelled = "تم الغاء التنفيذ";
   static const chatBotIsBusy = "البوت مشغول الان بتنفيذ الامر الحالي. انتظر حتي ينتهي او قم بالغاء المهمة الحاليه";
@@ -11,6 +12,7 @@ class Texts {
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";
+  static const recognizerNotAvailable = "خدمة تحويل الكلام الي نص غير متوفره الآن";
   static const errorNoInternetError = "تحقق من اتصال الانترنت الخاص بك و حاول مجدداً";
   static const errorRecognizerBusy = "البوت مشغول ولا يمكن استخدامه حاليا !!";
   static const errorNeedMicPermission = "اذن الوصول الي الميكروفون مطلوب للاستمرار !";

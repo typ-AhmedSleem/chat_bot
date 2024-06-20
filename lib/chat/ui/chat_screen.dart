@@ -86,12 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
             state: _state,
             answerRequest: _currentActionAnswerRequest,
             onVoiceInputPressed: () async {
-              final speech = await askChatBot() ?? "";
-              if (speech.isEmpty) {
-                showToast(Texts.errorNoSpeechWasRecognized);
-                return "";
-              }
-              return speech;
+              return await askChatBot() ?? "";
             },
             onCancelPressed: () {
               cancelCurrentAction();
@@ -107,11 +102,11 @@ class _ChatScreenState extends State<ChatScreen> {
               currentAction = action;
               if (action == null) {
                 _state = ChatBotState.idle;
-                sendMessage(Message.bot(content: Texts.unknownAction));
+                _updateLastMessage(content: Texts.unknownAction);
                 return;
               }
-              // * ===== Perform each action ===== * //
-              if (action is bot_actions.CreateAlarmAction) {
+              // * ===== Perform the action ===== * //
+              else if (action is bot_actions.CreateAlarmAction) {
                 await performScheduleAlarmAction(content);
               } else if (action is bot_actions.SearchAction) {
                 await performSearchAction();
@@ -119,11 +114,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 await performCreateTaskAction();
               } else if (action is bot_actions.ShowAllTasksAction) {
                 await performShowAllTasksAction();
-              } else {
-                // Unknown action
-                _updateLastMessage(content: action.title);
-                cancelCurrentAction();
-                return;
               }
             },
             onSubmitAnswerForAction: (rawAnswer) async {
@@ -193,22 +183,23 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<String?> askChatBot() async {
+    if (messages.last.isMe) {
+      sendMessage(Message.bot(content: Texts.listening));
+    }
     setState(() {
       _state = ChatBotState.listening;
     });
     try {
-      final userSpeech = (await chatBot.askChatBot(throws: true))!!;
-      if (userSpeech.isEmpty) {
-        // No speech was recognized
-        showToast(Texts.errorNoSpeechWasRecognized);
-        return null;
-      }
+      final userSpeech = (await chatBot.askChatBot(throws: true))!;
       // Return the recognized speech
       return userSpeech;
     } on PlatformException catch (e) {
+      print("askChatBot faced an error: $e");
       final code = int.parse(e.code);
       final error = ChatBotError.getErrorByCode(code);
-      if (error != null) sendMessage(Message.bot(content: error.message));
+      if (error != null) {
+        _updateLastMessage(content: error.message);
+      }
       return null;
     } finally {
       setState(() {
