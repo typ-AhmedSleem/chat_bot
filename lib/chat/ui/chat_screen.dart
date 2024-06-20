@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:chat_bot/actions/action_answer.dart';
 import 'package:chat_bot/actions/actions.dart' as bot_actions;
-import 'package:chat_bot/chat/ui/widgets/chat_action_announcement_bubble.dart';
 import 'package:chat_bot/chat/utils/chatbot_state.dart';
 import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot/chat_bot_errors.dart';
@@ -79,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     final nextMsg = messages[idx + 1];
                     showTail = currMsg.isMe != nextMsg.isMe;
                   }
-                  if (currMsg.sender == SenderType.announcement) return ActionAnnouncementBubble(content: currMsg.content);
+                  // if (currMsg.sender == SenderType.announcement) return ActionAnnouncementBubble(content: currMsg.content);
                   return ChatBubble.ofMessage(msg: currMsg, showTail: showTail);
                 }),
           ),
@@ -302,6 +301,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> performSearchAction() async {
     // * Ask user for image uploading
+    final imagePath = await chatBot.pickImageFromGallery();
     // * Validate and preprocess the uploaded image
     // * Send message in chat screen
     // * Prepare api call to the target endpoint

@@ -3,16 +3,23 @@ import 'package:chat_bot/helpers/texts.dart';
 
 enum SenderType { user, bot, announcement }
 
+enum MessageType { text, image }
+
 class Message {
+  final MessageType type;
   final String content;
   final SenderType sender;
   final String timestamp;
 
   bool get isMe => (SenderType.user == sender);
 
-  Message({required this.content, required this.sender, required this.timestamp});
+  bool get isImageMessage => (MessageType.image == type);
 
-  static Message now({required String content, required SenderType sender}) => Message(content: content, sender: sender, timestamp: nowFormatted());
+  Message({required this.type, required this.content, required this.sender, required this.timestamp});
+
+  static Message now({MessageType type = MessageType.text, required String content, required SenderType sender}) {
+    return Message(type: type, content: content, sender: sender, timestamp: nowFormatted());
+  }
 
   static Message user({required String content}) => now(content: content, sender: SenderType.user);
 
@@ -20,11 +27,11 @@ class Message {
 
   static Message announcement({required String content}) => now(content: content, sender: SenderType.announcement);
 
-  static Message defaultMessage() {
-    return Message.bot(content: Texts.startOfChatMessageContent);
-  }
+  static Message image({required String path}) => now(type: MessageType.image, content: path, sender: SenderType.user);
 
-  Message editedClone({String? content, SenderType? sender, String? timestamp}) {
-    return Message(content: content ?? this.content, sender: sender ?? this.sender, timestamp: timestamp ?? this.timestamp);
+  static Message defaultMessage() => Message.bot(content: Texts.startOfChatMessageContent);
+
+  Message editedClone({MessageType? type, String? content, SenderType? sender, String? timestamp}) {
+    return Message(type: type ?? this.type, content: content ?? this.content, sender: sender ?? this.sender, timestamp: timestamp ?? this.timestamp);
   }
 }
