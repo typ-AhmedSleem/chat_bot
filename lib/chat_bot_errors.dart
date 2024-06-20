@@ -28,7 +28,7 @@ abstract class ChatBotError {
 }
 
 class CBError extends ChatBotError {
-  CBError({required message}) : super(code: -1, message: message);
+  CBError({super.code = -1, required super.message});
 }
 
 class CBNoSpeechRecognizedError extends ChatBotError {

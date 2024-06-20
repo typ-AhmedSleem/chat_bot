@@ -11,6 +11,7 @@ class Texts {
   static const answerYes = "نعم";
   static const actionFinished = "اكتمل التنفيذ";
   static const chatBotReady = "جاهز لتنفيذ امر اخر";
+  static const invalidPhoneNumber = "رقم الهاتف غير صحيح";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";
@@ -20,6 +21,7 @@ class Texts {
   static const errorNeedMicPermission = "اذن الوصول الي الميكروفون مطلوب للاستمرار !";
   static const errorOccurredWhileDoingAction = "حدث خطأ اثناء تنفيذ الامر";
   static const noInternetConnection = "فشل رفع الصورة الي الخادم. تحقق من اتصال الانترنت و حاول مره اخري";
+  static const cantGetPatientProfile = "فشل الحصول علي بيانات الملف الشخصي";
 
   // Create Alarm action
   static const createAlarmAction = "هل تريد انشاء تنبيه في الوقت الذي حددته؟";

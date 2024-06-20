@@ -50,7 +50,14 @@ class ChatBot {
     return imgXFile?.path;
   }
 
+  Future<String?> pickVideoFromGallery() async {
+    final XFile? imgXFile = await _imagePicker.pickVideo(source: ImageSource.gallery);
+    return imgXFile?.path;
+  }
+
   Future<String> recognizeFaces(String imagePath) {
     return api.recognizeFaces(imagePath: imagePath);
   }
+
+// todo: implement wrappers here for the rest of api requests of the PatientsAPI class
 }

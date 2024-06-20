@@ -1,4 +1,3 @@
-// import "dart:convert";
 import 'dart:convert';
 
 import 'package:chat_bot/api/chat_bot_api_helper.dart';
@@ -46,6 +45,273 @@ class PatientAPI {
     } catch (e) {
       // * Error uploading
       logger.log("recognizeFaces[ERROR]: $e");
+      rethrow;
+    }
+  }
+
+  Future<String?> getPatientProfile(String patientId) async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetPatientProfile/$patientId"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.cantGetPatientProfile);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getPatientProfile[ERROR]: $e");
+    }
+  }
+
+  Future<String?> getPatientRelatedMembers(String patientId) async {
+    try {
+      final response = await http.get(
+        // API endpoint
+        helper.resolveEndpoint("GetPatientRelatedMembers/$patientId"),
+        // Headers
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getPatientRelatedMembers[ERROR]: $e");
+    }
+  }
+
+  Future<bool> updatePatientProfile(String phoneNumber, int age, String diagnosisDate, int maximumDistance) async {
+    // * Validate if phone number length is > 1
+    if (phoneNumber.isEmpty) throw CBError(message: Texts.invalidPhoneNumber);
+    // Make post request
+    final response = await http.post(
+      // API endpoint
+      helper.resolveEndpoint("UpdatePatientProfile"),
+      // Headers
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      // Request body
+      body: jsonEncode(<String, Object>{
+        "phoneNumber": phoneNumber,
+        "age": age,
+        "diagnosisDate": diagnosisDate,
+        "maximumDistance": maximumDistance,
+      }),
+    );
+    // * Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
+
+  Future<String?> getFamilyLocation(String familyId) async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetFamilyLocation/$familyId"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getFamilyLocation[ERROR]: $e");
+    }
+  }
+
+  Future<bool> markMedicationReminder(String medictaionId, bool isTaken) async {
+    // Make post request
+    final response = await http.post(
+      // API endpoint
+      helper.resolveEndpoint("MarkMedicationReminder"),
+      // Headers
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      // Request body
+      body: jsonEncode(<String, Object>{
+        "medictaionId": medictaionId,
+        "isTaken": isTaken,
+      }),
+    );
+    // * Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
+
+// todo: AddSecretFile endpoint hasn't yet been implemented
+
+  Future<bool> askToSeeSecretFile({required String videoPath}) async {
+    // * Resolve the endpoint
+    final endpoint = helper.resolveEndpoint("AskToSeeSecretFile");
+    // * Create the request
+    final request = http.MultipartRequest('POST', endpoint)..files.add(await http.MultipartFile.fromPath('file', videoPath));
+    try {
+      // * Send the request
+      final response = await request.send();
+      // * Handle the response
+      return response.statusCode == 200;
+    } on http.ClientException catch (e) {
+      // * Error uploading
+      logger.log("askToSeeSecretFile[ERROR]: No internet found. $e");
+      throw CBError(message: Texts.noInternetConnection);
+    } catch (e) {
+      // * Error uploading
+      logger.log("askToSeeSecretFile[ERROR]: $e");
+      rethrow;
+    }
+  }
+
+  Future<String?> getSecretFile() async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetSecretFile"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getSecretFile[ERROR]: $e");
+    }
+  }
+
+  Future<String?> getAllAppointments() async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetAllAppointments"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getAllAppointments[ERROR]: $e");
+    }
+  }
+
+  Future<String?> getAllMedicines() async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetAllMedicines"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getAllMedicines[ERROR]: $e");
+    }
+  }
+
+  Future<String?> getMedia() async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetMedia"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getMedia[ERROR]: $e");
+    }
+  }
+
+  Future<String?> getAllGameScores() async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetAllGameScores"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getAllGameScores[ERROR]: $e");
+    }
+  }
+
+  Future<bool> addGameScore(int difficultyGame, int patientScore) async {
+    // Make post request
+    final response = await http.post(
+      // API endpoint
+      helper.resolveEndpoint("AddGameScore"),
+      // Headers
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      // Request body
+      body: jsonEncode(<String, Object>{
+        "difficultyGame": difficultyGame,
+        "patientScore": patientScore,
+      }),
+    );
+    // * Return true if request success (code = 200), false otherwise
+    return response.statusCode == 200;
+  }
+
+  Future<String> getCurrentAndMaxScore() async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint("GetCurrentAndMaxScore"),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("getCurrentAndMaxScore[ERROR]: $e");
+      rethrow;
+    }
+  }
+
+  Future<dynamic> simpleGetRequest({required String endpoint}) async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint(endpoint),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("$endpoint[ERROR]: $e");
       rethrow;
     }
   }
