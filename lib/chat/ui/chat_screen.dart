@@ -208,7 +208,7 @@ class _ChatScreenState extends State<ChatScreen> {
     } on PlatformException catch (e) {
       final code = int.parse(e.code);
       final error = ChatBotError.getErrorByCode(code);
-      if (error != null) showToast(error.message);
+      if (error != null) sendMessage(Message.bot(content: error.message));
       return null;
     } finally {
       setState(() {

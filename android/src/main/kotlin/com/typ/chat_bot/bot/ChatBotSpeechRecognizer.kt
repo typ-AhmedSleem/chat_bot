@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import android.widget.Toast
-import com.typ.chat_bot.R
 import com.typ.chat_bot.errors.SpeechRecognitionError
 import com.typ.chat_bot.utils.Logger
 
@@ -47,7 +45,6 @@ class ChatBotSpeechRecognizer(private val context: Context) : RecognitionListene
      */
     override fun onReadyForSpeech(params: Bundle?) {
         logger.log("onReadyForSpeech. Listening...")
-        Toast.makeText(context, context.getString(R.string.start_speaking), Toast.LENGTH_SHORT).show()
     }
 
     /**

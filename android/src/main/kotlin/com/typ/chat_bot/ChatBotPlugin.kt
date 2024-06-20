@@ -1,6 +1,5 @@
 package com.typ.chat_bot
 
-import android.widget.Toast
 import com.typ.chat_bot.bot.ChatBot
 import com.typ.chat_bot.errors.SpeechRecognitionError
 import com.typ.chat_bot.utils.Logger
@@ -33,19 +32,16 @@ class ChatBotPlugin : FlutterPlugin, MethodCallHandler {
                 // Listen what user says using SpeechRecognizer
                 bot.listenToUser { text, error ->
                     if (error != null) {
-                        // Check if the error is a missing permission
+                        // * Check if the error is a missing permission
                         if (error is SpeechRecognitionError.SRNotSupportedError) {
                             // Open app permissions on device settings
-                            Toast.makeText(bot.context, bot.context.getString(R.string.check_permission_or_internet), Toast.LENGTH_SHORT).show()
 //                            bot.showAppSettings()
-                        } else if (error is SpeechRecognitionError.SRNoMatchError) {
-                            Toast.makeText(bot.context, bot.context.getString(R.string.can_t_understand_what_you_said), Toast.LENGTH_SHORT).show()
                         }
-                        // Result the error back to flutter
+                        // * Result the error back to flutter
                         result.error(error.code.toString(), error.message, null)
                         return@listenToUser
                     }
-                    // Result the text to flutter
+                    // * Result the text to flutter
                     result.success(text)
                 }
             }
