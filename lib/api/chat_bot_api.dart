@@ -13,7 +13,26 @@ class PatientAPI {
   final helper = ApiHelper("Patient");
   final logger = Logger("PatientAPI");
 
-  Future<String> recognizeFaces({required String imagePath}) async {
+  Future<dynamic> simpleGetRequest({required String endpoint}) async {
+    try {
+      final response = await http.get(
+          // API endpoint
+          helper.resolveEndpoint(endpoint),
+          // Headers
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
+      // * Handle the response
+      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
+      // * Return the response body
+      return response.body;
+    } catch (e) {
+      logger.log("$endpoint[ERROR]: $e");
+      rethrow;
+    }
+  }
+
+  Future<String> recognizeFaces(String imagePath) async {
     // * Resolve the endpoint
     final endpoint = helper.resolveEndpoint("RecognizeFaces");
     // * Create the request
@@ -92,7 +111,7 @@ class PatientAPI {
     // * Validate if phone number length is > 1
     if (phoneNumber.isEmpty) throw CBError(message: Texts.invalidPhoneNumber);
     // Make post request
-    final response = await http.post(
+    final response = await http.put(
       // API endpoint
       helper.resolveEndpoint("UpdatePatientProfile"),
       // Headers
@@ -191,22 +210,27 @@ class PatientAPI {
     return response.statusCode == 200;
   }
 
-  Future<dynamic> simpleGetRequest({required String endpoint}) async {
-    try {
-      final response = await http.get(
-          // API endpoint
-          helper.resolveEndpoint(endpoint),
-          // Headers
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          });
-      // * Handle the response
-      if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
-      // * Return the response body
-      return response.body;
-    } catch (e) {
-      logger.log("$endpoint[ERROR]: $e");
-      rethrow;
-    }
+  Future<String> getSecretFile() async {
+    return await simpleGetRequest(endpoint: "GetSecretFile");
+  }
+
+  Future<String> getAllAppointments() async {
+    return await simpleGetRequest(endpoint: "GetAllAppointments");
+  }
+
+  Future<String> getAllMedicines() async {
+    return await simpleGetRequest(endpoint: "GetAllMedicines");
+  }
+
+  Future<String> getMedia() async {
+    return await simpleGetRequest(endpoint: "GetMedia");
+  }
+
+  Future<String> getAllGameScores() async {
+    return await simpleGetRequest(endpoint: "GetAllGameScores");
+  }
+
+  Future<String> getCurrentAndMaxScore() async {
+    return await simpleGetRequest(endpoint: "GetCurrentAndMaxScore");
   }
 }

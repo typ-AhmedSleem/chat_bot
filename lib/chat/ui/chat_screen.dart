@@ -320,7 +320,7 @@ class _ChatScreenState extends State<ChatScreen> {
       });
 
       // * Send the api call
-      final String recognizedFaces = await chatBot.recognizeFaces(imagePath);
+      final String recognizedFaces = await chatBot.api.recognizeFaces(imagePath);
 
       // * Handle response from the api call
       if (recognizedFaces.isEmpty) throw CBError(message: Texts.cantRecognizeFaces);
