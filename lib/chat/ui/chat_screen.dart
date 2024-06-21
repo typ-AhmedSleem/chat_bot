@@ -207,7 +207,6 @@ class _ChatScreenState extends State<ChatScreen> {
       // Return the recognized speech
       return userSpeech;
     } on PlatformException catch (e) {
-      print("askChatBot faced an error: $e");
       final code = int.parse(e.code);
       final error = ChatBotError.getErrorByCode(code);
       if (error != null) {
@@ -320,11 +319,11 @@ class _ChatScreenState extends State<ChatScreen> {
       });
 
       // * Send the api call
-      final String recognizedFaces = await chatBot.api.recognizeFaces(imagePath);
+      final recognizedFaces = await chatBot.api.recognizeFaces(imagePath);
 
       // * Handle response from the api call
       if (recognizedFaces.isEmpty) throw CBError(message: Texts.cantRecognizeFaces);
-      sendMessage(Message.bot(content: recognizedFaces), doBeforeSending: () async {
+      sendMessage(Message.bot(content: recognizedFaces.toString()), doBeforeSending: () async {
         await sendMessage(Message.announcement(content: Texts.facesRecognized));
       });
 

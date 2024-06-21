@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:chat_bot/api/chat_bot_api_helper.dart';
 import 'package:chat_bot/chat_bot_errors.dart';
+import 'package:chat_bot/chatbot_secrets.dart';
 import 'package:chat_bot/helpers/logger.dart';
 import 'package:chat_bot/helpers/texts.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +15,7 @@ class PatientAPI {
   final helper = ApiHelper("Patient");
   final logger = Logger("PatientAPI");
 
-  Future<dynamic> simpleGetRequest({required String endpoint}) async {
+  Future<Map<String, dynamic>> simpleGetRequest({required String endpoint}) async {
     try {
       final response = await http.get(
           // API endpoint
@@ -21,35 +23,35 @@ class PatientAPI {
           // Headers
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
+            "Authorization": authToken,
           });
       // * Handle the response
       if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
       // * Return the response body
-      return response.body;
+      return jsonDecode(response.body);
     } catch (e) {
       logger.log("$endpoint[ERROR]: $e");
       rethrow;
     }
   }
 
-  Future<String> recognizeFaces(String imagePath) async {
+  Future<Map<String, dynamic>> recognizeFaces(String imagePath) async {
     // * Resolve the endpoint
     final endpoint = helper.resolveEndpoint("RecognizeFaces");
     // * Create the request
-    final request = http.MultipartRequest('POST', endpoint)..files.add(await http.MultipartFile.fromPath('file', imagePath));
+    final request = http.MultipartRequest('POST', endpoint)..files.add(await http.MultipartFile.fromPath('Image', imagePath));
+    request.headers[HttpHeaders.authorizationHeader] = authToken;
     try {
       // * Send the request
       final response = await request.send();
       // * Handle the response
+      final responseData = await response.stream.bytesToString();
+      final jsonResponse = jsonDecode(responseData);
       if (response.statusCode == 200) {
-        final responseData = await response.stream.bytesToString();
-        final jsonResponse = jsonDecode(responseData);
-        logger.log("recognizeFaces[SUCCESS]: Response => '$response'");
-        logger.log("recognizeFaces[SUCCESS]: DecodedResponse => '$jsonResponse'");
+        logger.log("recognizeFaces[SUCCESS]: decodedResponse => '$jsonResponse'");
         return jsonResponse;
       } else {
         // * Request failed
-        logger.log("recognizeFaces[FAIL]: Response => '${response.statusCode} | ${response.reasonPhrase}'");
         if (response.statusCode == 401) {
           // 401 means: Server refused the request because it's 'Unauthorized'
           throw CBError(message: Texts.serverRefusedTheRequest);
@@ -76,6 +78,7 @@ class PatientAPI {
           // Headers
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
+            HttpHeaders.authorizationHeader: authToken,
           });
       // * Handle the response
       if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.cantGetPatientProfile);
@@ -95,6 +98,7 @@ class PatientAPI {
         // Headers
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
+          HttpHeaders.authorizationHeader: authToken,
         },
       );
       // * Handle the response
@@ -117,6 +121,7 @@ class PatientAPI {
       // Headers
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        HttpHeaders.authorizationHeader: authToken,
       },
       // Request body
       body: jsonEncode(<String, Object>{
@@ -138,6 +143,7 @@ class PatientAPI {
           // Headers
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
+            HttpHeaders.authorizationHeader: authToken,
           });
       // * Handle the response
       if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
@@ -157,6 +163,7 @@ class PatientAPI {
       // Headers
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        HttpHeaders.authorizationHeader: authToken,
       },
       // Request body
       body: jsonEncode(<String, Object>{
@@ -174,7 +181,8 @@ class PatientAPI {
     // * Resolve the endpoint
     final endpoint = helper.resolveEndpoint("AskToSeeSecretFile");
     // * Create the request
-    final request = http.MultipartRequest('POST', endpoint)..files.add(await http.MultipartFile.fromPath('file', videoPath));
+    final request = http.MultipartRequest('POST', endpoint)..files.add(await http.MultipartFile.fromPath('Video', videoPath));
+    request.headers[HttpHeaders.authorizationHeader] = authToken;
     try {
       // * Send the request
       final response = await request.send();
@@ -199,6 +207,7 @@ class PatientAPI {
       // Headers
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        HttpHeaders.authorizationHeader: authToken,
       },
       // Request body
       body: jsonEncode(<String, Object>{
@@ -210,27 +219,27 @@ class PatientAPI {
     return response.statusCode == 200;
   }
 
-  Future<String> getSecretFile() async {
+  Future<Map<String, dynamic>> getSecretFile() async {
     return await simpleGetRequest(endpoint: "GetSecretFile");
   }
 
-  Future<String> getAllAppointments() async {
+  Future<Map<String, dynamic>> getAllAppointments() async {
     return await simpleGetRequest(endpoint: "GetAllAppointments");
   }
 
-  Future<String> getAllMedicines() async {
+  Future<Map<String, dynamic>> getAllMedicines() async {
     return await simpleGetRequest(endpoint: "GetAllMedicines");
   }
 
-  Future<String> getMedia() async {
+  Future<Map<String, dynamic>> getMedia() async {
     return await simpleGetRequest(endpoint: "GetMedia");
   }
 
-  Future<String> getAllGameScores() async {
+  Future<Map<String, dynamic>> getAllGameScores() async {
     return await simpleGetRequest(endpoint: "GetAllGameScores");
   }
 
-  Future<String> getCurrentAndMaxScore() async {
+  Future<Map<String, dynamic>> getCurrentAndMaxScore() async {
     return await simpleGetRequest(endpoint: "GetCurrentAndMaxScore");
   }
 }
