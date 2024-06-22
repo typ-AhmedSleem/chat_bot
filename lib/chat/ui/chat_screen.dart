@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:chat_bot/actions/action_answer.dart';
 import 'package:chat_bot/actions/actions.dart' as bot_actions;
+import 'package:chat_bot/api/models/response_models.dart';
 import 'package:chat_bot/chat/utils/chatbot_state.dart';
 import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot/chat_bot_errors.dart';
@@ -321,11 +322,12 @@ class _ChatScreenState extends State<ChatScreen> {
       // * Send the api call
       final recognizedFaces = await chatBot.api.recognizeFaces(imagePath);
 
-      // * Handle response from the api call
+      // * Handle recognized persons
       if (recognizedFaces.isEmpty) throw CBError(message: Texts.cantRecognizeFaces);
-      sendMessage(Message.bot(content: recognizedFaces.toString()), doBeforeSending: () async {
-        await sendMessage(Message.announcement(content: Texts.facesRecognized));
-      });
+      await sendMessage(Message.announcement(content: Texts.facesRecognized));
+      for (RecognizedPerson person in recognizedFaces) {
+        sendMessage(Message.bot(content: person.toString()));
+      }
 
       // * Finish the current action
       finishCurrentAction(delay: const Duration(seconds: 1));

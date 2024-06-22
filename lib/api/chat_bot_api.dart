@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_bot/api/chat_bot_api_helper.dart';
+import 'package:chat_bot/api/models/response_models.dart';
 import 'package:chat_bot/chat_bot_errors.dart';
 import 'package:chat_bot/chatbot_secrets.dart';
 import 'package:chat_bot/helpers/logger.dart';
@@ -35,7 +36,7 @@ class PatientAPI {
     }
   }
 
-  Future<Map<String, dynamic>> recognizeFaces(String imagePath) async {
+  Future<List<RecognizedPerson>> recognizeFaces(String imagePath) async {
     // * Resolve the endpoint
     final endpoint = helper.resolveEndpoint("RecognizeFaces");
     // * Create the request
@@ -49,7 +50,15 @@ class PatientAPI {
       final jsonResponse = jsonDecode(responseData);
       if (response.statusCode == 200) {
         logger.log("recognizeFaces[SUCCESS]: decodedResponse => '$jsonResponse'");
-        return jsonResponse;
+        final List<RecognizedPerson> recognizedPersons = List.empty(growable: true);
+        for (Map<String, dynamic> rawPerson in jsonResponse["personsInImage"]) {
+          try {
+            recognizedPersons.add(RecognizedPerson.fromJson(rawPerson));
+          } catch (_) {
+            continue;
+          }
+        }
+        return recognizedPersons;
       } else {
         // * Request failed
         if (response.statusCode == 401) {
