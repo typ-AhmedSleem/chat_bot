@@ -326,7 +326,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (recognizedFaces.isEmpty) throw CBError(message: Texts.cantRecognizeFaces);
       await sendMessage(Message.announcement(content: Texts.facesRecognized));
       for (RecognizedPerson person in recognizedFaces) {
-        sendMessage(Message.bot(content: person.toString()));
+        sendMessage(Message.api(payload: person));
       }
 
       // * Finish the current action

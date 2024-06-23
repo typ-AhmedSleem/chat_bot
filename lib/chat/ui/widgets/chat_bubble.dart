@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_bot/api/models/response_models.dart';
 import 'package:chat_bot/chat/ui/widgets/chat_action_announcement_bubble.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,16 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // * Return the bubble widget suitable for this message
+    // * Check if the message is api message
+    if (message is APIMessage) {
+      final msg = message as APIMessage;
+      if (msg.payload is RecognizedPerson) {
+        return UserInfoWidget(person: msg.payload as RecognizedPerson);
+      } else {
+        return Text(msg.payload.toString());
+      }
+    }
+    // * Normal messages
     switch (message.type) {
       case MessageType.text:
         if (message.sender == SenderType.announcement) {
@@ -40,5 +50,73 @@ class ChatBubble extends StatelessWidget {
       default:
         return Container();
     }
+  }
+}
+
+class UserInfoWidget extends StatelessWidget {
+  final RecognizedPerson person;
+
+  const UserInfoWidget({super.key, required this.person});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: ClipOval(
+                child: SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Image.network(
+                    person.familyAvatarUrl,
+                    isAntiAlias: true,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              person.familyName,
+              style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Relation: ${person.relation}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Phone Number: ${person.familyPhoneNumber}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Description: ${person.descriptionOfPatient}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Location:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Latitude: ${person.familyLatitude}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            Text(
+              'Longitude: ${person.familyLongitude}',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

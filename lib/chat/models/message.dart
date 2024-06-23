@@ -1,7 +1,7 @@
 import 'package:chat_bot/helpers/datetime_helper.dart';
 import 'package:chat_bot/helpers/texts.dart';
 
-enum SenderType { user, bot, announcement }
+enum SenderType { user, bot, announcement, api }
 
 enum MessageType { text, image }
 
@@ -29,9 +29,17 @@ class Message {
 
   static Message image({required String path}) => now(type: MessageType.image, content: path, sender: SenderType.user);
 
+  static Message api({required dynamic payload}) => APIMessage(payload);
+
   static Message defaultMessage() => Message.bot(content: Texts.startOfChatMessageContent);
 
   Message editedClone({MessageType? type, String? content, SenderType? sender, String? timestamp}) {
     return Message(type: type ?? this.type, content: content ?? this.content, sender: sender ?? this.sender, timestamp: timestamp ?? this.timestamp);
   }
+}
+
+class APIMessage extends Message {
+  final dynamic payload;
+
+  APIMessage(this.payload) : super(type: MessageType.text, content: payload.toString(), sender: SenderType.bot, timestamp: nowFormatted());
 }
