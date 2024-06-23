@@ -29,6 +29,11 @@ abstract class ChatBotError {
 
 class CBError extends ChatBotError {
   CBError({super.code = -1, required super.message});
+
+  @override
+  String toString() {
+    return "$runtimeType{code= $code, msg= '$message'}";
+  }
 }
 
 class CBNoSpeechRecognizedError extends ChatBotError {

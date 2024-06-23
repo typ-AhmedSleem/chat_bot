@@ -19,16 +19,22 @@ class RecognizedPerson {
   RecognizedPerson.fromJson(Map<String, dynamic> raw)
       : this(
           familyName: raw["familyName"],
-          relation: raw["relation"],
+          relation: raw["relationalityOfThisPatient"],
           familyLatitude: raw["familyLatitude"],
           familyLongitude: raw["familyLongitude"],
           familyPhoneNumber: raw["familyPhoneNumber"],
-          descriptionOfPatient: raw["descriptionOfPatient"],
+          descriptionOfPatient: raw["descriptionForPatient"],
           familyAvatarUrl: raw["familyAvatarUrl"],
         );
 
   @override
   String toString() {
-    return "Name: $familyName\n";
+    return 'familyName: $familyName,\n'
+        'relation: $relation,\n'
+        'familyLatitude: $familyLatitude,\n'
+        'familyLongitude: $familyLongitude,\n'
+        'familyPhoneNumber: $familyPhoneNumber,\n'
+        'descriptionOfPatient: $descriptionOfPatient,\n'
+        'familyAvatarUrl: $familyAvatarUrl\n';
   }
 }

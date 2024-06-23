@@ -29,7 +29,7 @@ class PatientAPI {
       // * Handle the response
       if (response.statusCode != 200) throw CBError(code: response.statusCode, message: Texts.errorOccurredWhileDoingAction);
       // * Return the response body
-      return jsonDecode(response.body);
+      return decodeJsonResponse(response.body);
     } catch (e) {
       logger.log("$endpoint[ERROR]: $e");
       rethrow;
@@ -47,17 +47,19 @@ class PatientAPI {
       final response = await request.send();
       // * Handle the response
       final responseData = await response.stream.bytesToString();
-      final jsonResponse = jsonDecode(responseData);
+      logger.log("code: ${response.statusCode}, rawResponse: '${responseData.trim()}'");
+      final jsonResponse = decodeJsonResponse(responseData);
       if (response.statusCode == 200) {
-        logger.log("recognizeFaces[SUCCESS]: decodedResponse => '$jsonResponse'");
         final List<RecognizedPerson> recognizedPersons = List.empty(growable: true);
         for (Map<String, dynamic> rawPerson in jsonResponse["personsInImage"]) {
           try {
             recognizedPersons.add(RecognizedPerson.fromJson(rawPerson));
-          } catch (_) {
+          } catch (e) {
+            logger.log("Resolve person failed with error: $e");
             continue;
           }
         }
+        logger.log("Recognized ${recognizedPersons.length} person in the photo.");
         return recognizedPersons;
       } else {
         // * Request failed
