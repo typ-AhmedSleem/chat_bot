@@ -11,8 +11,14 @@ import 'helpers/logger.dart';
 /// that ChatBot can do
 class ChatBot {
   final logger = Logger("ChatBot");
-  final api = PatientAPI();
+  late final PatientAPI _api;
   final _imagePicker = ImagePicker();
+
+  ChatBot({required String token}) {
+    _api = PatientAPI(token: token);
+  }
+
+  PatientAPI get api => _api;
 
   /// Starts SpeechToText service in
   /// the android native side and return

@@ -2,7 +2,13 @@ import 'dart:math';
 
 import 'package:chat_bot/actions/action_answer.dart';
 import 'package:chat_bot/actions/actions.dart' as bot_actions;
-import 'package:chat_bot/api/models/response_models.dart';
+import 'package:chat_bot/api/chat_bot_api.dart';
+import 'package:chat_bot/api/models/appointment.dart';
+import 'package:chat_bot/api/models/media.dart';
+import 'package:chat_bot/api/models/medicine.dart';
+import 'package:chat_bot/api/models/patient_related_member.dart';
+import 'package:chat_bot/api/models/recognized_person.dart';
+import 'package:chat_bot/api/models/secret_file.dart';
 import 'package:chat_bot/chat/utils/chatbot_state.dart';
 import 'package:chat_bot/chat_bot.dart';
 import 'package:chat_bot/chat_bot_errors.dart';
@@ -16,27 +22,14 @@ import '../models/message.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/chatbot_message_bar.dart';
 
-void main() async {
-  runApp(const ChatApp());
-}
-
-class ChatApp extends StatelessWidget {
-  const ChatApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Chat Bot',
-      home: const ChatScreen(),
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-    );
-  }
-}
-
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  late final ChatBot _chatBot;
+
+  ChatScreen({super.key, required String token}) {
+    _chatBot = ChatBot(token: token);
+  }
+
+  ChatBot get chatBot => _chatBot;
 
   @override
   State<StatefulWidget> createState() => _ChatScreenState();
@@ -46,7 +39,6 @@ class _ChatScreenState extends State<ChatScreen> {
   // Runtime
   bot_actions.Action? currentAction;
   ActionAnswerRequest? _currentActionAnswerRequest;
-  final chatBot = ChatBot();
   final List<Message> messages = [
     Message.defaultMessage(),
   ];
@@ -59,8 +51,15 @@ class _ChatScreenState extends State<ChatScreen> {
   final _listScrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    _performAPITest();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Center(
           child: Text('Chatbot'),
@@ -138,7 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   cancelCurrentAction();
                   return true;
                 }
-                final scheduled = await chatBot.scheduleAlarm(id: Random().nextInt(1000), timestamp: action.alarmTime);
+                final scheduled = await widget.chatBot.scheduleAlarm(id: Random().nextInt(1000), timestamp: action.alarmTime);
                 if (!scheduled) {
                   sendMessage(Message.bot(content: "تعذر انشاء تنبيه كما طلبت."));
                   await finishCurrentAction();
@@ -204,7 +203,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _state = ChatBotState.listening;
     });
     try {
-      final userSpeech = (await chatBot.askChatBot(throws: true))!;
+      final userSpeech = (await widget.chatBot.askChatBot(throws: true))!;
       // Return the recognized speech
       return userSpeech;
     } on PlatformException catch (e) {
@@ -232,7 +231,7 @@ class _ChatScreenState extends State<ChatScreen> {
     sendMessage(Message.bot(content: Texts.thinking));
     // * Identify action
     await Future.delayed(const Duration(milliseconds: 1000));
-    return await chatBot.identifyAction(content);
+    return await widget.chatBot.identifyAction(content);
   }
 
   void cancelCurrentAction({bool reportWithMessage = true}) {
@@ -302,7 +301,7 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       // * Ask user for image uploading
       _updateLastMessage(content: Texts.uploadPictureToSearch);
-      final String? imagePath = await chatBot.pickImageFromGallery();
+      final String? imagePath = await widget.chatBot.pickImageFromGallery();
       // * Validate the image
       if (imagePath == null) throw CBError(message: "Image picker returned a null path.");
       if (imagePath.isEmpty) throw CBError(message: "Image picker returned an empty path.");
@@ -315,16 +314,16 @@ class _ChatScreenState extends State<ChatScreen> {
       _updateLastMessage(content: Texts.imageAccepted);
 
       // * Do some fancy UI updates
-      await sendMessage(Message.announcement(content: Texts.uploadingImage), doAfterSending: () async {
+      await sendMessage(Message.bot(content: Texts.uploadingImage), doAfterSending: () async {
         await Future.delayed(const Duration(milliseconds: 250));
       });
 
       // * Send the api call
-      final recognizedFaces = await chatBot.api.recognizeFaces(imagePath);
+      final recognizedFaces = await widget.chatBot.api.recognizeFaces(imagePath);
 
       // * Handle recognized persons
       if (recognizedFaces.isEmpty) throw CBError(message: Texts.cantRecognizeFaces);
-      await sendMessage(Message.announcement(content: Texts.facesRecognized));
+      await sendMessage(Message.bot(content: Texts.facesRecognized));
       for (RecognizedPerson person in recognizedFaces) {
         sendMessage(Message.api(payload: person));
       }
@@ -353,6 +352,178 @@ class _ChatScreenState extends State<ChatScreen> {
     // * Query database for tasks created today
     // * Represent the returned tasks list as String
     // * Display the tasks in a message
+    finishCurrentAction();
+  }
+
+  Future<void> _performAPITest() async {
+    await sendMessage(Message.user(content: "Test APIs"), doBeforeSending: () async {
+      await Future.delayed(const Duration(seconds: 1));
+    }, doAfterSending: () async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await sendMessage(Message.bot(content: "Start testing of APIs..."), doAfterSending: () async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await sendMessage(Message.user(content: "Test:  [searchForSomeone]"));
+    await performSearchAction();
+    // Region: Start of APIs test
+
+    // * getPatientProfile
+    await sendMessage(Message.user(content: "Test:  [getPatientProfile]"));
+    await ApiRunner.run(
+        name: "getPatientProfile",
+        runner: widget.chatBot.api.getPatientProfile,
+        onSuccess: (profile) async {
+          await sendMessage(Message.api(payload: profile));
+        },
+        onFail: (error) async {
+          await sendMessage(Message.bot(content: error.message));
+        });
+    await sendMessage(Message.announcement(content: "Finished testing [getPatientProfile]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * getPatientRelatedMembers
+    await sendMessage(Message.user(content: "Test:  [getPatientRelatedMembers]"));
+    await ApiRunner.run(
+        name: "getPatientRelatedMembers",
+        runner: widget.chatBot.api.getPatientRelatedMembers,
+        onSuccess: (members) async {
+          for (PatientRelatedMember member in members) {
+            await sendMessage(Message.api(payload: member));
+          }
+        },
+        onFail: (error) async {
+          await sendMessage(Message.bot(content: error.message));
+        });
+    await sendMessage(Message.announcement(content: "Finished testing [getPatientRelatedMembers]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * updatePatientProfile
+    await sendMessage(Message.user(content: "Test:  [updatePatientProfile]"));
+    await ApiRunner.run(
+        name: "updatePatientProfile",
+        runner: () => widget.chatBot.api.updatePatientProfile("123", 23, "29/6/2024", 123),
+        onSuccess: (response) async => await sendMessage(Message.bot(content: response)),
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)));
+    await sendMessage(Message.announcement(content: "Finished testing [updatePatientProfile]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * getFamilyLocation
+    await sendMessage(Message.user(content: "Test:  [getFamilyLocation]"));
+    await ApiRunner.run(
+        name: "getFamilyLocation",
+        runner: () async => await widget.chatBot.api.getFamilyLocation("12323"),
+        onSuccess: (location) async => await sendMessage(Message.api(payload: location)),
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)));
+    await sendMessage(Message.announcement(content: "Finished testing [getFamilyLocation]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * markMedicationReminder
+    await sendMessage(Message.user(content: "Test:  [markMedicationReminder]"));
+    await ApiRunner.run(
+        name: "markMedicationReminder",
+        runner: () => widget.chatBot.api.markMedicationReminder("m", true),
+        onSuccess: (response) async => await sendMessage(Message.bot(content: response)),
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)));
+    await sendMessage(Message.announcement(content: "Finished testing [markMedicationReminder]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * askToSeeSecretFile
+    await sendMessage(Message.user(content: "Test:  [askToSeeSecretFile]"));
+    await ApiRunner.run(
+        name: "askToSeeSecretFile",
+        runner: () async => widget.chatBot.api.askToSeeSecretFile(videoPath: await widget.chatBot.pickVideoFromGallery() ?? ""),
+        onSuccess: (response) async => await sendMessage(Message.bot(content: response)),
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)));
+    await sendMessage(Message.announcement(content: "Finished testing [askToSeeSecretFile]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * addGameScore
+    await sendMessage(Message.user(content: "Test:  [addGameScore]"));
+    await ApiRunner.run(
+        name: "addGameScore",
+        runner: () async => widget.chatBot.api.addGameScore(5, 2),
+        onSuccess: (response) async => await sendMessage(Message.bot(content: response)),
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)));
+    await sendMessage(Message.announcement(content: "Finished testing [addGameScore]"));
+    await Future.delayed(const Duration(seconds: 1));
+    //
+    // * getSecretFile
+    await sendMessage(Message.user(content: "Test:  [getSecretFile]"));
+    await ApiRunner.run(
+        name: "getSecretFile",
+        runner: widget.chatBot.api.getSecretFile,
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)),
+        onSuccess: (files) async {
+          for (SecretFile file in files) {
+            await sendMessage(Message.api(payload: file));
+          }
+        });
+    await sendMessage(Message.announcement(content: "Finished testing [getSecretFile]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * getAllAppointments
+    await sendMessage(Message.user(content: "Test:  [getAllAppointments]"));
+    await ApiRunner.run(
+        name: "getAllAppointments",
+        runner: widget.chatBot.api.getAllAppointments,
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)),
+        onSuccess: (appointments) async {
+          for (Appointment appointment in appointments) {
+            await sendMessage(Message.api(payload: appointment));
+          }
+        });
+    await sendMessage(Message.announcement(content: "Finished testing [getAllAppointments]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * getAllMedicines
+    await sendMessage(Message.user(content: "Test:  [getAllMedicines]"));
+    await ApiRunner.run(
+        name: "getAllMedicines",
+        runner: widget.chatBot.api.getAllMedicines,
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)),
+        onSuccess: (medicines) async {
+          for (Medicine medicine in medicines) {
+            await sendMessage(Message.api(payload: medicine));
+          }
+        });
+    await sendMessage(Message.announcement(content: "Finished testing [getAllMedicines]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * getMedia
+    await sendMessage(Message.user(content: "Test:  [getMedia]"));
+    await ApiRunner.run(
+        name: "getMedia",
+        runner: widget.chatBot.api.getMedia,
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)),
+        onSuccess: (mediaFiles) async {
+          for (Media media in mediaFiles) {
+            await sendMessage(Message.api(payload: media));
+          }
+        });
+    await sendMessage(Message.announcement(content: "Finished testing [getMedia]"));
+    await Future.delayed(const Duration(seconds: 1));
+
+    // * getAllGameScores
+    // await sendMessage(Message.user(content: "Test:  [getAllGameScores]"));
+    // await ApiRunner.run(
+    //     name: "getAllGameScores",
+    //     runner: widget.chatBot.api.getAllGameScores,
+    //     onSuccess: (response) async => await sendMessage(Message.bot(content: response.toString())),
+    //     onFail: (error) async => await sendMessage(Message.bot(content: error.message)));
+    // await sendMessage(Message.announcement(content: "Finished testing [getAllGameScores]"));
+    // await Future.delayed(const Duration(seconds: 1));
+
+    // * getCurrentAndMaxScore
+    await sendMessage(Message.user(content: "Test:  [getCurrentAndMaxScore]"));
+    await ApiRunner.run(
+        name: "getCurrentAndMaxScore",
+        runner: widget.chatBot.api.getCurrentAndMaxScore,
+        onSuccess: (data) async => await sendMessage(Message.api(payload: data)),
+        onFail: (error) async => await sendMessage(Message.bot(content: error.message)));
+    await sendMessage(Message.announcement(content: "Finished testing [getCurrentAndMaxScore]"));
+    await Future.delayed(const Duration(seconds: 1));
+    // Region: End of APIs test
     finishCurrentAction();
   }
 }
