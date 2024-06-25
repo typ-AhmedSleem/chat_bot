@@ -20,3 +20,12 @@ Map<String, dynamic> decodeJsonResponse(String rawJson) {
   if (json.isEmpty) return <String, dynamic>{};
   return jsonDecode(json) as Map<String, dynamic>;
 }
+
+List<T> resolveJsonList<T>(List<dynamic> jsons, {required T Function(Map<String, dynamic> json) process}) {
+  print("resolveJsonList: type= ${jsons[0].runtimeType}, jsons= $jsons");
+  final List<T> list = List.empty(growable: true);
+  for (Map<String, dynamic> json in jsons) {
+    list.add(process(json));
+  }
+  return list;
+}
