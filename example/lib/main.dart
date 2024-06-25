@@ -2,6 +2,9 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:chat_bot/chat/ui/chat_screen.dart';
 import 'package:flutter/material.dart';
 
+const String authToken =
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMjI2ZTdkMC02NmU0LTRkNGItOTI2Mi1mZDY2OGEyZTRhYjgiLCJlbWFpbCI6ImVzbGFtYWhtZWR3b3JrNEBnbWFpbC5jb20iLCJGdWxsTmFtZSI6Itin2YTZhdix2YrYtiAvINiz2YrYryDYp9mE2YXZh9iv2YogIiwiUGhvbmVOdW1iZXIiOiIwMTI4MzQzOTIwMiIsInVpZCI6IjIxMjYwZjQ1LWViOTUtNDZiMy05M2Q0LTU5NGNjODkwMjUwOCIsIlVzZXJBdmF0YXIiOiJodHRwczovL2VsZWN0cm9uaWNtaW5kb2ZhbHpoZWltZXJwYXRpZW50cy5henVyZXdlYnNpdGVzLm5ldC9Vc2VyIEF2YXRhci8yMTI2MGY0NS1lYjk1LTQ2YjMtOTNkNC01OTRjYzg5MDI1MDhfMzE1MTBkZmUtYWEzMC00YmZkLTkyYWItYmRjOWRlNmYyYzJjLmpwZyIsIk1haW5MYXRpdHVkZSI6IjMwLjAwMTkxMiIsIk1haW5Mb25naXR1ZGUiOiIzMS4zMzQ3MzciLCJyb2xlcyI6IlBhdGllbnQiLCJNYXhEaXN0YW5jZSI6IjI1IiwiZXhwIjoxNzI2NzgzODc2LCJpc3MiOiJBcnRPZkNvZGluZyIsImF1ZCI6IkFsemhlaW1hckFwcCJ9.caeJst4Bjlkv5SsKKWNmGpr7J9M8O-ZEdYuXO_kC3FA";
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -10,12 +13,20 @@ void main() async {
   runApp(const ChatApp());
 }
 
-// class MyApp extends StatefulWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
+class ChatApp extends StatelessWidget {
+  const ChatApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Chat Bot',
+      home: ChatScreen(token: authToken),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+    );
+  }
+}
 
 // class _MyAppState extends State<MyApp> {
 //   final chatBot = ChatBot();
