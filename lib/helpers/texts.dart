@@ -12,6 +12,7 @@ class Texts {
   static const actionFinished = "اكتمل التنفيذ";
   static const chatBotReady = "جاهز لتنفيذ امر اخر";
   static const invalidPhoneNumber = "رقم الهاتف غير صحيح";
+  static const executing = "يتم التنفيذ";
 
   // Errors
   static const errorNoSpeechWasRecognized = "قم بقول الذي تريده !";

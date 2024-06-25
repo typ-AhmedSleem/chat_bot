@@ -214,7 +214,7 @@ class PatientAPI {
   Future<String> addSecretFile({required String filePath, String? fileDescription}) async {
     final XFile file = XFile(filePath);
     // * Resolve the endpoint
-    final endpoint = helper.resolveEndpoint("AskToSeeSecretFile");
+    final endpoint = helper.resolveEndpoint("AddSecretFile");
     // * Create the request
     final request = http.MultipartRequest('POST', endpoint)..files.add(await http.MultipartFile.fromPath('File', filePath));
     request.headers[HttpHeaders.authorizationHeader] = _token;
@@ -228,11 +228,11 @@ class PatientAPI {
       return rawResponse;
     } on http.ClientException catch (e) {
       // * Error uploading
-      logger.log("askToSeeSecretFile[ERROR]: No internet found. $e");
+      logger.log("addSecretFile[ERROR]: No internet found. $e");
       throw CBError(message: Texts.noInternetConnection);
     } catch (e) {
       // * Error uploading
-      logger.log("askToSeeSecretFile[ERROR]: $e");
+      logger.log("addSecretFile[ERROR]: $e");
       rethrow;
     }
   }
@@ -321,12 +321,15 @@ class PatientAPI {
 }
 
 class ApiRunner {
-  static Future<void> run<T>({String? name, required Future<T> Function() runner, required Function(T) onSuccess, required Function(CBError) onFail}) async {
+  static Future<void> run<T>({String? name, Function? onStart, required Future<T> Function() runner, required Function(T) onSuccess, required Function(CBError) onFail, Function? onFinish}) async {
     try {
+      if (onStart != null) await onStart();
       await onSuccess(await runner());
     } catch (e) {
       print("Error while running api '${name ?? ""}': ${e is! CBError ? CBError(message: e.toString()) : e}");
       await onFail(CBError(message: Texts.errorOccurredWhileDoingAction));
+    } finally {
+      if (onFinish != null) await onFinish();
     }
   }
 }
